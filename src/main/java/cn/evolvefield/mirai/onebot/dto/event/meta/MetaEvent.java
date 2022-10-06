@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.dto.event.request;
+package cn.evolvefield.mirai.onebot.dto.event.meta;
 
 import cn.evolvefield.mirai.onebot.dto.event.Event;
 import com.google.gson.annotations.SerializedName;
@@ -9,27 +9,22 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Created on 2022/7/8.
- *
- * @author cnlimiter
+ * Description:
+ * Author: cnlimiter
+ * Date: 2022/10/7 1:09
+ * Version: 1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
-public class RequestEvent extends Event {
+public class MetaEvent extends Event {
+    @SerializedName("meta_event_type")
+    private String metaEventType;
 
-    @SerializedName( "request_type")
-    private String requestType;
-
-    @SerializedName( "user_id")
-    private long userId;
-
-    @SerializedName( "comment")
-    private String comment;
-
-    @SerializedName( "flag")
-    private String flag;
-
+    @Override
+    public void setPostType(String postType) {
+        super.setPostType("meta_event");
+    }
 }

@@ -9,7 +9,10 @@ plugins {
 group = 'cn.evolvefield.mirai'
 version = '0.1.0'
 
-
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public' }
@@ -18,12 +21,20 @@ repositories {
 
 dependencies {
     implementation 'org.projectlombok:lombok:1.18.24'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'io.netty:netty-all:4.1.82.Final'
+    implementation 'com.alibaba.fastjson2:fastjson2-parent:2.0.14'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'com.google.code.gson:gson:2.8.9'
+    annotationProcessor 'com.google.code.gson:gson:2.9.0'
+    //annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'
+    annotationProcessor 'io.netty:netty-all:4.1.82.Final'
+    annotationProcessor 'com.alibaba.fastjson2:fastjson2-parent:2.0.14'
+
 
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.release.set(17)
+
 }

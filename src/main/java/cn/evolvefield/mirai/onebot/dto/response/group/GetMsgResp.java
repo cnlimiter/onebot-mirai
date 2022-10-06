@@ -1,43 +1,57 @@
-package cn.evolvefield.mirai.onebot.dto.event.message;
+package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import cn.evolvefield.mirai.onebot.entity.Anonymous;
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
+ * Created on 2022/9/6.
+ *
  * @author cnlimiter
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
-public class GroupMessageEvent extends MessageEvent {
+public class GetMsgResp {
 
+    /**
+     * 消息id
+     */
     @SerializedName( "message_id")
     private int messageId;
 
-    @SerializedName( "sub_type")
-    private String subType;
+    /**
+     * 消息真实id
+     */
+    @SerializedName( "real_id")
+    private int realId;
 
-    @SerializedName( "group_id")
-    private long groupId;
-
-    @SerializedName( "anonymous")
-    private Anonymous anonymous;
-
+    /**
+     * 发送者
+     */
     @SerializedName( "sender")
-    private GroupSender sender;
+    private Sender sender;
+
+    /**
+     * 发送时间
+     */
+    @SerializedName( "time")
+    private int time;
+
+    /**
+     * 消息内容
+     */
+    @SerializedName( "message")
+    private String message;
+
+    /**
+     * 原始消息内容
+     */
+    @SerializedName( "raw_message")
+    private String rawMessage;
 
     /**
      * sender信息
      */
     @Data
-    public static class GroupSender {
+    public static class Sender {
 
         @SerializedName( "user_id")
         private String userId;

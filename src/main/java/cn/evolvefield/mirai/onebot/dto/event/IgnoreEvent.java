@@ -3,6 +3,7 @@ package cn.evolvefield.mirai.onebot.dto.event;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -13,14 +14,18 @@ import lombok.experimental.SuperBuilder;
  * Version: 1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class IgnoreEvent {
-    @SerializedName("post_type")
-    private String postType = "IGNORED";
+@EqualsAndHashCode(callSuper = true)
+public class IgnoreEvent extends Event{
+    public IgnoreEvent(){
+        this.setPostType("IGNORED");
+        this.setTime(System.currentTimeMillis());
+    }
+    public IgnoreEvent(long id){
+        this.setPostType("IGNORED");
+        this.setTime(System.currentTimeMillis());
+        this.setSelfId(id);
+    }
 
-    @SerializedName( "time")
-    private long time = System.currentTimeMillis();
 
 }

@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event.message;
 
-import cn.evolvefield.onebot.sdk.model.bean.MsgChainBean;
-import cn.evolvefield.onebot.sdk.model.event.Event;
+import cn.evolvefield.mirai.onebot.entity.MsgChainBean;
+import cn.evolvefield.mirai.onebot.dto.event.Event;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
