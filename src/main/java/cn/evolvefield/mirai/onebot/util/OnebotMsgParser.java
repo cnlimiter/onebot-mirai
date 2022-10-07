@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.event.events.MessageEvent;
 import net.mamoe.mirai.message.data.*;
 
 import java.util.*;
@@ -45,6 +46,41 @@ public class OnebotMsgParser {
 
             return messageChain.build();
         }
+    }
+
+     public static String toCQString(SingleMessage message){
+        if (message instanceof PlainText text) return escape(text.getContent());
+
+        else if (message instanceof At at) return "[CQ:at,qq=" +at.getTarget() + "]";
+
+        else if (message instanceof Face face) return "[CQ:face,id=" + face.getId() + "]";
+
+        else if (message instanceof VipFace vipFace) return "[CQ:vipface,id="+vipFace.getKind().getId()+",name=" +vipFace.getKind().getName()+ ",count=" +vipFace.getCount()+ "]";
+
+        else if (message instanceof PokeMessage pokeMessage) return "[CQ:poke,id=" +pokeMessage.getId()+ ",type= "+pokeMessage.getPokeType()+" ,name="+pokeMessage.getName()+"]";
+
+        else if (message instanceof AtAll all) return "[CQ:at,qq=all]";
+
+        else if (message instanceof Image image) return "[CQ:image,file="+image.getImageId()+",url="+escape(Image.queryUrl(image))+"]";
+
+        else if (message instanceof FlashImage flashImage) return "[CQ:image,file="+flashImage.getImage().getImageId()+",url="+escape(Image.queryUrl(flashImage.getImage()))+",type=flash]";
+
+        else if (message instanceof ServiceMessage serviceMessage){
+            if (serviceMessage.getContent().contains("xml version")) return "[CQ:xml,data="+escape(serviceMessage.getContent())+"]";
+            else return "[CQ:json,data="+escape(serviceMessage.getContent())+"]";
+        }
+        else if (message instanceof LightApp app) return "[CQ:json,data="+escape(app.getContent())+"]";
+
+        else if (message instanceof MessageSource) return "";
+
+        else if (message instanceof QuoteReply quoteReply) return "[CQ:reply,id="+DataBaseUtils.toMessageId(quoteReply.getSource().getInternalIds(), quoteReply.getSource().getBotId(), quoteReply.getSource().getFromId())+"]";
+
+        else if (message instanceof OnlineAudio audio) return "[CQ:record,url="+escape(audio.getUrlForDownload())+",file="+ Arrays.toString(audio.getFileMd5()) +"]";
+
+        else if (message instanceof Audio audio) return "[CQ:record,url=,file="+ Arrays.toString(audio.getFileMd5()) +"]";
+
+        else return "此处消息的转义尚未被插件支持";
+
     }
 
 

@@ -29,7 +29,9 @@ public class EventMap {
     public Event toDTO(BotEvent botEvent, boolean isRawMessage){
         EventMap.isRawMessage = isRawMessage;
         if (botEvent instanceof MessageEvent messageEvent){
+            var event = new GroupIncreaseNoticeEvent();
 
+            return event;
         }
         else if (botEvent instanceof MemberJoinEvent joinEvent){
             if (joinEvent instanceof MemberJoinEvent.Active active){
