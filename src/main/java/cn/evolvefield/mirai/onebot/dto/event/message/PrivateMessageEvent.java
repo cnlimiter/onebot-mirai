@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.mamoe.mirai.contact.Friend;
+import net.mamoe.mirai.contact.Member;
+import net.mamoe.mirai.contact.NormalMember;
 
 /**
  * 私聊消息
@@ -33,7 +36,18 @@ public class PrivateMessageEvent extends MessageEvent {
      */
     @Data
     public static class PrivateSender {
-
+        public PrivateSender(Friend sender){
+            this.userId = sender.getId();
+            this.nickname = sender.getNick();
+            this.age = sender.queryProfile().getAge();
+            this.sex = sender.queryProfile().getSex().name().toLowerCase();
+        }
+        public PrivateSender(NormalMember sender){
+            this.userId = sender.getId();
+            this.nickname = sender.getNick();
+            this.age = sender.queryProfile().getAge();
+            this.sex = sender.queryProfile().getSex().name().toLowerCase();
+        }
         @SerializedName( "user_id")
         private long userId;
 

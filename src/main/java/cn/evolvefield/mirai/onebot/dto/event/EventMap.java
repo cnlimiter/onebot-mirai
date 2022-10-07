@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
+import cn.evolvefield.mirai.onebot.dto.event.message.MessageMap;
 import cn.evolvefield.mirai.onebot.dto.event.notice.*;
 import cn.evolvefield.mirai.onebot.dto.event.request.FriendAddRequestEvent;
 import cn.evolvefield.mirai.onebot.dto.event.request.GroupAddRequestEvent;
@@ -28,11 +29,7 @@ public class EventMap {
 
     public Event toDTO(BotEvent botEvent, boolean isRawMessage){
         EventMap.isRawMessage = isRawMessage;
-        if (botEvent instanceof MessageEvent messageEvent){
-            var event = new GroupIncreaseNoticeEvent();
-
-            return event;
-        }
+        if (botEvent instanceof MessageEvent messageEvent) return MessageMap.toDTO(messageEvent);
         else if (botEvent instanceof MemberJoinEvent joinEvent){
             if (joinEvent instanceof MemberJoinEvent.Active active){
                 var event = new GroupIncreaseNoticeEvent();

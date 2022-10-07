@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.mamoe.mirai.contact.Member;
 
 /**
  * @author cnlimiter
@@ -38,9 +39,22 @@ public class GroupMessageEvent extends MessageEvent {
      */
     @Data
     public static class GroupSender {
+        public GroupSender(Member sender){
+            this.userId = sender.getId();
+            this.nickname = sender.getNick();
+            this.card = sender.getNameCard();
+            this.age = sender.queryProfile().getAge();
+            this.area = "";
+            this.sex = sender.queryProfile().getSex().name().toLowerCase();
+            this.role = sender.getPermission().name().toLowerCase();
+            this.level = String.valueOf(sender.queryProfile().getQLevel());
+            this.title = sender.getSpecialTitle();
+
+        }
+
 
         @SerializedName( "user_id")
-        private String userId;
+        private long userId;
 
         @SerializedName( "nickname")
         private String nickname;

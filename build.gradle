@@ -24,9 +24,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'io.netty:netty-all:4.1.82.Final'
     implementation 'com.alibaba.fastjson2:fastjson2-parent:2.0.14'
+    implementation 'org.java-websocket:Java-WebSocket:1.5.3'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'com.google.code.gson:gson:2.9.0'
-    //annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'
+    annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'
     annotationProcessor 'io.netty:netty-all:4.1.82.Final'
     annotationProcessor 'com.alibaba.fastjson2:fastjson2-parent:2.0.14'
 

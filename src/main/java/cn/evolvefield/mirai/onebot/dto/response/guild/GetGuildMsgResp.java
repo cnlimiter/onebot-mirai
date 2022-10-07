@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.guild;
 
-import cn.evolvefield.onebot.sdk.model.event.message.GuildMessageEvent;
+import cn.evolvefield.mirai.onebot.dto.event.message.GuildMessageEvent;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
