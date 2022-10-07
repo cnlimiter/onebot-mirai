@@ -13,7 +13,7 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 </p>
 
 
-### 更新日志: [CHANGELOG](https://github.com/cnlimiter/onebot-mirai/blob/main/CHANGELOG.md)
+### 更新日志: [CHANGELOG](https://github.com/cnlimiter/onebot-mirai/blob/master/CHANGELOG.md)
 
 ### 开源协议
 [AGPL-3.0](LICENSE) © cnlimiter
