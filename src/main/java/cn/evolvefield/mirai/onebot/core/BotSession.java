@@ -6,12 +6,13 @@ import cn.evolvefield.mirai.onebot.dto.event.EventMap;
 import cn.evolvefield.mirai.onebot.dto.event.IgnoreEvent;
 import cn.evolvefield.mirai.onebot.web.websocket.OnebotWebSocketServer;
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.events.BotEvent;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Description:
@@ -38,21 +39,24 @@ public class BotSession {
         this.botConfig = botConfig;
         this.apiImpl = new MiraiApi(bot);
         this.websocketServer = new OnebotWebSocketServer(this);
+        websocketServer.startWS();
     }
 
     public void close(){
         websocketServer.stop();
     }
 
-    public String subscribeEvent(BotEvent event){
+    public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event, true);
         if (!(e instanceof IgnoreEvent)) {
             var json = JSON.toJSONString(e);
             OneBotMirai.logger.debug(String.format("将发送事件: %s", json));
             this.eventSubscriptionString.add(json);
-            return json;
         }
-        return "";
+    }
+    public String subscribeEvent(String listener){
+        this.eventSubscriptionString.add(listener);
+        return listener;
     }
 
     public void unsubscribeEvent(String msg){

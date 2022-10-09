@@ -1,11 +1,14 @@
 package cn.evolvefield.mirai.onebot.web.websocket;
 
+import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.BotSession;
+import cn.evolvefield.mirai.onebot.util.ActionUtils;
 import cn.evolvefield.mirai.onebot.web.websocket.common.WSServerConfig;
 import cn.evolvefield.mirai.onebot.web.websocket.core.FastWSServer;
 import cn.evolvefield.mirai.onebot.web.websocket.core.WebSocketSession;
 import io.netty.channel.ChannelHandler;
+import okhttp3.Route;
 
 /**
  * Description:
@@ -14,10 +17,15 @@ import io.netty.channel.ChannelHandler;
  * Version: 1.0
  */
 public class OnebotWebSocketServer extends FastWSServer {
+
+
+
     public OnebotWebSocketServer INSTANCE = this;
 
     private final BotSession botSession;
     private final PluginConfig.BotConfig botConfig;
+
+    private String listener;
 
     public OnebotWebSocketServer(BotSession botSession){
         this.botSession = botSession;
@@ -35,9 +43,23 @@ public class OnebotWebSocketServer extends FastWSServer {
 
     @Override
     public void onMessage(WebSocketSession session, String message) {
-        //var listener = botSession.subscribeEvent()
+
+        try {
+            OneBotMirai.logger.debug("Bot: ${session.bot.id} 正向Websocket服务端 / 开始处理API请求");
+
+            ActionUtils.handleWebSocketActions(session, botSession.getApiImpl(), message);
+
+        } finally {
+            OneBotMirai.logger.debug("Bot: ${session.bot.id} 正向Websocket服务端 / 连接被关闭");
+            botSession.unsubscribeEvent(listener);
+        }
     }
 
+    @Override
+    public void send(WebSocketSession session, String message) {
+        this.listener = botSession.subscribeEvent(message);
+        super.send(session, listener);
+    }
 
     @Override
     public void onClose(WebSocketSession session) {
@@ -48,4 +70,6 @@ public class OnebotWebSocketServer extends FastWSServer {
     public void onError(WebSocketSession session, Throwable e) {
         super.onError(session, e);
     }
+
+
 }

@@ -3,7 +3,6 @@ package cn.evolvefield.mirai.onebot;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.SessionManager;
 import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.console.plugin.jvm.AbstractJvmPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.event.Event;
@@ -29,7 +28,7 @@ public final class OneBotMirai extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("Plugin loaded!");
+        logger.info("Plugin loaded!");
         this.config = new PluginConfig();
         this.reloadPluginData(config);
         logger.info("Plugin loaded!");
@@ -50,7 +49,7 @@ public final class OneBotMirai extends JavaPlugin {
 
         initialSubscription = GlobalEventChannel.INSTANCE.subscribeAlways(BotEvent.class, event -> {
             if (SessionManager.getSessions().containsKey(event.getBot().getId())){
-                SessionManager.getSessions().get(event.getBot().getId()).subscribeEvent(event);
+                SessionManager.getSessions().get(event.getBot().getId()).triggerEvent(event);
             }
             if (event instanceof BotOnlineEvent onlineEvent){
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
@@ -66,6 +65,13 @@ public final class OneBotMirai extends JavaPlugin {
             else if (event instanceof MessageEvent messageEvent){
                 if (!SessionManager.containsSession(messageEvent.getBot().getId())) {
                     var session = SessionManager.get(messageEvent.getBot().getId());
+                    if (messageEvent instanceof GroupMessageEvent groupMessageEvent){
+                        session.getApiImpl().getCachedSourceQueue().add(groupMessageEvent.getSource());
+                    }
+                    else if (messageEvent instanceof GroupTempMessageEvent groupTempMessageEvent){
+                        session.getApiImpl().getCachedTempContact()
+                                .put(groupTempMessageEvent.getSender().getId(), groupTempMessageEvent.getGroup().getId());
+                    }
                 }
             }
             else if (event instanceof NewFriendRequestEvent requestEvent) {

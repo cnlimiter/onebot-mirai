@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
@@ -19,4 +20,6 @@ public class ActionData<T> {
     private int retCode;
     @JSONField(name = "data")
     private T data;
+    @JSONField(name = "echo")
+    private String echo;
 }

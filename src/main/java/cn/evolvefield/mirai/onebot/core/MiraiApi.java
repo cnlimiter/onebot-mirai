@@ -1,11 +1,16 @@
 package cn.evolvefield.mirai.onebot.core;
 
+import cn.evolvefield.mirai.onebot.dto.response.ActionData;
+import cn.evolvefield.mirai.onebot.dto.response.msic.PluginFailure;
+import cn.evolvefield.mirai.onebot.util.ApiParams;
 import cn.evolvefield.mirai.onebot.web.queue.CacheRequestQueue;
 import cn.evolvefield.mirai.onebot.web.queue.CacheSourceQueue;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -16,14 +21,22 @@ import java.util.Map;
  */
 public class MiraiApi {
     Bot bot;
-    Map<Long, Long>  cachedTempContact = new HashMap<>();
-   @Getter
-   public CacheRequestQueue cacheRequestQueue = new CacheRequestQueue();
-   @Getter
-   public CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
+    @Getter
+    private LinkedHashMap<Long, Long> cachedTempContact = new LinkedHashMap<>();
+    @Getter
+    private CacheRequestQueue cacheRequestQueue = new CacheRequestQueue();
+    @Getter
+    private CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
     public MiraiApi(Bot bot){
         this.bot = bot;
     }
+
+    public ActionData<?> callMiraiApi(String action, JSONObject params, MiraiApi mirai){
+        var responseDTO = new PluginFailure();
+
+        return responseDTO;
+    }
+
 
 //    public ActionData<?> sendMessage(ApiParams params){
 //        if (params.containsKey("message_type")) {
