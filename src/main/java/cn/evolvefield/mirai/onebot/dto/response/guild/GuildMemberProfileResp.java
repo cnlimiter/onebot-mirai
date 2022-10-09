@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.guild;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -11,28 +11,28 @@ import java.util.List;
 @Data
 public class GuildMemberProfileResp {
 
-    @SerializedName( "tiny_id")
+    @JSONField(name = "tiny_id")
     private String tinyId;
 
-    @SerializedName( "nickname")
+    @JSONField(name = "nickname")
     private String nickname;
 
-    @SerializedName( "avatar_url")
+    @JSONField(name = "avatar_url")
     private String avatarUrl;
 
-    @SerializedName( "join_time")
+    @JSONField(name = "join_time")
     private String joinTime;
 
-    @SerializedName( "roles")
+    @JSONField(name = "roles")
     private List<RoleInfo> roles;
 
     @Data
     public static class RoleInfo {
 
-        @SerializedName( "role_id")
+        @JSONField(name = "role_id")
         private String roleId;
 
-        @SerializedName( "role_name")
+        @JSONField(name = "role_name")
         private String roleName;
 
     }

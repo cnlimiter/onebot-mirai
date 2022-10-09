@@ -1,7 +1,8 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
 import cn.evolvefield.mirai.onebot.dto.response.ChannelInfoResp;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,25 +22,25 @@ public class ChannelCreatedNoticeEvent extends NoticeEvent {
     /**
      * 频道ID
      */
-    @SerializedName( "guild_id")
+    @JSONField(name = "guild_id")
     private String guildId;
 
     /**
      * 子频道ID
      */
-    @SerializedName( "channel_id")
+    @JSONField(name = "channel_id")
     private String channelId;
 
     /**
      * 操作者ID
      */
-    @SerializedName( "operator_id")
+    @JSONField(name = "operator_id")
     private String operatorId;
 
     /**
      * 频道信息
      */
-    @SerializedName( "channel_info")
+    @JSONField(name = "channel_info")
     private ChannelInfoResp channelInfo;
 
 }

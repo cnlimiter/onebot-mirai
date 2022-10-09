@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -14,13 +14,13 @@ import java.util.List;
 @Data
 public class ActionList<T> {
 
-    @SerializedName( "status")
+    @JSONField(name = "status")
     private String status;
 
-    @SerializedName( "retcode")
+    @JSONField(name = "retcode")
     private int retCode;
 
-    @SerializedName( "data")
+    @JSONField(name = "data")
     private List<T> data;
 
 }

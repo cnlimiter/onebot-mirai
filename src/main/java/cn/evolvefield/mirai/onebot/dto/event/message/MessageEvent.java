@@ -2,7 +2,7 @@ package cn.evolvefield.mirai.onebot.dto.event.message;
 
 import cn.evolvefield.mirai.onebot.entity.MsgChainBean;
 import cn.evolvefield.mirai.onebot.dto.event.Event;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,19 +21,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class MessageEvent extends Event {
 
-    @SerializedName( "message_type")
+    @JSONField(name = "message_type")
     private String messageType;
 
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
-    @SerializedName( "message")
+    @JSONField(name = "message")
     private String message;
 
-    @SerializedName( "raw_message")
+    @JSONField(name = "raw_message")
     private String rawMessage;
 
-    @SerializedName( "font")
+    @JSONField(name = "font")
     private int font;
 
     private List<MsgChainBean> arrayMsg;

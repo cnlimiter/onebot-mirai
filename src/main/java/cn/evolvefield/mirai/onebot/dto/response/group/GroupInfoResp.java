@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -11,25 +11,25 @@ import lombok.Data;
 @Data
 public class GroupInfoResp {
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "group_name")
+    @JSONField(name = "group_name")
     private String groupName;
 
-    @SerializedName( "group_memo")
+    @JSONField(name = "group_memo")
     private String groupMemo;
 
-    @SerializedName( "group_create_time")
+    @JSONField(name = "group_create_time")
     private int groupCreateTime;
 
-    @SerializedName( "group_level")
+    @JSONField(name = "group_level")
     private int groupLevel;
 
-    @SerializedName( "member_count")
+    @JSONField(name = "member_count")
     private Integer memberCount;
 
-    @SerializedName( "max_member_count")
+    @JSONField(name = "max_member_count")
     private Integer maxMemberCount;
 
 }

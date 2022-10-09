@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.guild;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -9,13 +9,13 @@ import lombok.Data;
 @Data
 public class GuildServiceProfileResp {
 
-    @SerializedName( "nickname")
+    @JSONField(name = "nickname")
     private String nickname;
 
-    @SerializedName( "tiny_id")
+    @JSONField(name = "tiny_id")
     private String tinyId;
 
-    @SerializedName( "avatar_url")
+    @JSONField(name = "avatar_url")
     private String avatarUrl;
 
 }

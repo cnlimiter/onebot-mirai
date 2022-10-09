@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.guild;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -9,31 +9,31 @@ import lombok.Data;
 @Data
 public class GuildMetaByGuestResp {
 
-    @SerializedName( "guild_id")
+    @JSONField(name = "guild_id")
     private String guildId;
 
-    @SerializedName( "guild_name")
+    @JSONField(name = "guild_name")
     private String guildName;
 
-    @SerializedName( "guild_profile")
+    @JSONField(name = "guild_profile")
     private String guildProfile;
 
-    @SerializedName( "create_time")
+    @JSONField(name = "create_time")
     private long createTime;
 
-    @SerializedName( "max_member_count")
+    @JSONField(name = "max_member_count")
     private long maxMemberCount;
 
-    @SerializedName( "max_robot_count")
+    @JSONField(name = "max_robot_count")
     private long maxRobotCount;
 
-    @SerializedName( "max_admin_count")
+    @JSONField(name = "max_admin_count")
     private long maxAdminCount;
 
-    @SerializedName( "member_count")
+    @JSONField(name = "member_count")
     private long memberCount;
 
-    @SerializedName( "owner_id")
+    @JSONField(name = "owner_id")
     private String ownerId;
 
 }

@@ -2,6 +2,7 @@ package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.web.queue.CacheRequestQueue;
 import cn.evolvefield.mirai.onebot.web.queue.CacheSourceQueue;
+import lombok.Getter;
 import net.mamoe.mirai.Bot;
 
 import java.util.HashMap;
@@ -16,8 +17,10 @@ import java.util.Map;
 public class MiraiApi {
     Bot bot;
     Map<Long, Long>  cachedTempContact = new HashMap<>();
-    public static CacheRequestQueue cacheRequestQueue = new CacheRequestQueue();
-    public static CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
+   @Getter
+   public CacheRequestQueue cacheRequestQueue = new CacheRequestQueue();
+   @Getter
+   public CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
     public MiraiApi(Bot bot){
         this.bot = bot;
     }

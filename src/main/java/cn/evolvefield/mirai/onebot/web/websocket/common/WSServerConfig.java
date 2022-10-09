@@ -26,6 +26,8 @@ public interface WSServerConfig {
 
     ChannelHandler getChildHandler();
 
+    default String getUrl(){ return "127.0.0.1"; }
+
     /**
      * 默认端口8080
      */

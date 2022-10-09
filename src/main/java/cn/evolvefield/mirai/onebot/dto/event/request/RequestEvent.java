@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event.request;
 
 import cn.evolvefield.mirai.onebot.dto.event.Event;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,16 +20,16 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class RequestEvent extends Event {
 
-    @SerializedName( "request_type")
+    @JSONField(name = "request_type")
     private String requestType;
 
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
-    @SerializedName( "comment")
+    @JSONField(name = "comment")
     private String comment;
 
-    @SerializedName( "flag")
+    @JSONField(name = "flag")
     private String flag;
 
 }

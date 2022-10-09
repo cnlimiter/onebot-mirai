@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.request;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,10 +19,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class GroupAddRequestEvent extends RequestEvent {
 
-    @SerializedName( "sub_type")
+    @JSONField(name = "sub_type")
     private String subType;
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
 }

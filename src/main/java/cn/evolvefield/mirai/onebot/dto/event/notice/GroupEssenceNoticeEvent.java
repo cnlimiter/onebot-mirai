@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,12 +19,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 public class GroupEssenceNoticeEvent extends NoticeEvent{
-    @SerializedName( "sub_type")
+    @JSONField(name = "sub_type")
     private String  subType;//add,delete	添加为add,移出为delete
-    @SerializedName( "sender_id")
+    @JSONField(name = "sender_id")
     private Long  senderId	;//消息发送者ID
-    @SerializedName( "operator_id")
+    @JSONField(name = "operator_id")
     private Long operatorId;//操作者ID
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private Long messageId	;//消息ID
 }

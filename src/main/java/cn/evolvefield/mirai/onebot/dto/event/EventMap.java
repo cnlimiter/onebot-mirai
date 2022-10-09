@@ -27,7 +27,7 @@ public class EventMap {
 
     public static final MiraiLogger logger = OneBotMirai.logger;
 
-    public Event toDTO(BotEvent botEvent, boolean isRawMessage){
+    public static Event toDTO(BotEvent botEvent, boolean isRawMessage){
         EventMap.isRawMessage = isRawMessage;
         if (botEvent instanceof MessageEvent messageEvent) return MessageMap.toDTO(messageEvent);
         else if (botEvent instanceof MemberJoinEvent joinEvent){

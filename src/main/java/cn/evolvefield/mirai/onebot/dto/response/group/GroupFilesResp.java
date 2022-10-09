@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -21,32 +21,32 @@ public class GroupFilesResp {
     @Data
     public static class Files {
 
-        @SerializedName( "file_id")
+        @JSONField(name = "file_id")
         private String fileId;
 
-        @SerializedName( "file_name")
+        @JSONField(name = "file_name")
         private String fileName;
 
         private int busid;
 
-        @SerializedName( "file_size")
+        @JSONField(name = "file_size")
         private long fileSize;
 
-        @SerializedName( "upload_time")
+        @JSONField(name = "upload_time")
         private long uploadTime;
 
-        @SerializedName( "dead_time")
+        @JSONField(name = "dead_time")
         private long deadTime;
 
-        @SerializedName( "modify_time")
+        @JSONField(name = "modify_time")
         private long modifyTime;
 
-        @SerializedName( "download_times")
+        @JSONField(name = "download_times")
         private int downloadTimes;
 
         private long uploader;
 
-        @SerializedName( "uploader_name")
+        @JSONField(name = "uploader_name")
         private String uploaderName;
 
     }
@@ -57,21 +57,21 @@ public class GroupFilesResp {
     @Data
     public static class Folders {
 
-        @SerializedName( "folder_id")
+        @JSONField(name = "folder_id")
         private String folderId;
 
-        @SerializedName( "folder_name")
+        @JSONField(name = "folder_name")
         private String folderName;
 
-        @SerializedName( "create_time")
+        @JSONField(name = "create_time")
         private long createTime;
 
         private long creator;
 
-        @SerializedName( "creator_name")
+        @JSONField(name = "creator_name")
         private String creatorName;
 
-        @SerializedName( "total_file_count")
+        @JSONField(name = "total_file_count")
         private int totalFileCount;
 
     }

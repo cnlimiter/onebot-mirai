@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -11,49 +11,49 @@ import lombok.Data;
 @Data
 public class GroupMemberInfoResp {
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
-    @SerializedName( "nickname")
+    @JSONField(name = "nickname")
     private String nickname;
 
-    @SerializedName( "card")
+    @JSONField(name = "card")
     private String card;
 
-    @SerializedName( "sex")
+    @JSONField(name = "sex")
     private String sex;
 
-    @SerializedName( "age")
+    @JSONField(name = "age")
     private int age;
 
-    @SerializedName( "area")
+    @JSONField(name = "area")
     private String area;
 
-    @SerializedName( "join_time")
+    @JSONField(name = "join_time")
     private int joinTime;
 
-    @SerializedName( "last_sent_time")
+    @JSONField(name = "last_sent_time")
     private int lastSentTime;
 
-    @SerializedName( "level")
+    @JSONField(name = "level")
     private String level;
 
-    @SerializedName( "role")
+    @JSONField(name = "role")
     private String role;
 
-    @SerializedName( "unfriendly")
+    @JSONField(name = "unfriendly")
     private boolean unfriendly;
 
-    @SerializedName( "title")
+    @JSONField(name = "title")
     private String title;
 
-    @SerializedName( "title_expire_time")
+    @JSONField(name = "title_expire_time")
     private long titleExpireTime;
 
-    @SerializedName( "card_changeable")
+    @JSONField(name = "card_changeable")
     private boolean cardChangeable;
 
 }

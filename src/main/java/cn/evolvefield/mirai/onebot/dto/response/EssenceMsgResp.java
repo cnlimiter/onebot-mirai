@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -9,25 +9,25 @@ import lombok.Data;
 @Data
 public class EssenceMsgResp {
 
-    @SerializedName( "sender_id")
+    @JSONField(name = "sender_id")
     private long senderId;
 
-    @SerializedName( "sender_nick")
+    @JSONField(name = "sender_nick")
     private String senderNick;
 
-    @SerializedName( "sender_time")
+    @JSONField(name = "sender_time")
     private long senderTime;
 
-    @SerializedName( "operator_id")
+    @JSONField(name = "operator_id")
     private long operatorId;
 
-    @SerializedName( "operator_nick")
+    @JSONField(name = "operator_nick")
     private String operatorNick;
 
-    @SerializedName( "operator_time")
+    @JSONField(name = "operator_time")
     private String operatorTime;
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private int messageId;
 
 }

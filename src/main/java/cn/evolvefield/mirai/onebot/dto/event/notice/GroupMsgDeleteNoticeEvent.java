@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,13 +19,13 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class GroupMsgDeleteNoticeEvent extends NoticeEvent {
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "operator_id")
+    @JSONField(name = "operator_id")
     private long operatorId;
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private long msgId;
 
 }

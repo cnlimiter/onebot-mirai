@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -14,37 +14,37 @@ public class GetMsgResp {
     /**
      * 消息id
      */
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private int messageId;
 
     /**
      * 消息真实id
      */
-    @SerializedName( "real_id")
+    @JSONField(name = "real_id")
     private int realId;
 
     /**
      * 发送者
      */
-    @SerializedName( "sender")
+    @JSONField(name = "sender")
     private Sender sender;
 
     /**
      * 发送时间
      */
-    @SerializedName( "time")
+    @JSONField(name = "time")
     private int time;
 
     /**
      * 消息内容
      */
-    @SerializedName( "message")
+    @JSONField(name = "message")
     private String message;
 
     /**
      * 原始消息内容
      */
-    @SerializedName( "raw_message")
+    @JSONField(name = "raw_message")
     private String rawMessage;
 
     /**
@@ -53,31 +53,31 @@ public class GetMsgResp {
     @Data
     public static class Sender {
 
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private String userId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
-        @SerializedName( "card")
+        @JSONField(name = "card")
         private String card;
 
-        @SerializedName( "sex")
+        @JSONField(name = "sex")
         private String sex;
 
-        @SerializedName( "age")
+        @JSONField(name = "age")
         private int age;
 
-        @SerializedName( "area")
+        @JSONField(name = "area")
         private String area;
 
-        @SerializedName( "level")
+        @JSONField(name = "level")
         private String level;
 
-        @SerializedName( "role")
+        @JSONField(name = "role")
         private String role;
 
-        @SerializedName( "title")
+        @JSONField(name = "title")
         private String title;
 
     }

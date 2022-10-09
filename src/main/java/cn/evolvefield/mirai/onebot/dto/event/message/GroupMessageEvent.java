@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event.message;
 
 import cn.evolvefield.mirai.onebot.entity.Anonymous;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,19 +19,19 @@ import net.mamoe.mirai.contact.Member;
 @EqualsAndHashCode(callSuper = true)
 public class GroupMessageEvent extends MessageEvent {
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private int messageId;
 
-    @SerializedName( "sub_type")
+    @JSONField(name = "sub_type")
     private String subType;
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "anonymous")
+    @JSONField(name = "anonymous")
     private Anonymous anonymous;
 
-    @SerializedName( "sender")
+    @JSONField(name = "sender")
     private GroupSender sender;
 
     /**
@@ -53,31 +53,31 @@ public class GroupMessageEvent extends MessageEvent {
         }
 
 
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private long userId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
-        @SerializedName( "card")
+        @JSONField(name = "card")
         private String card;
 
-        @SerializedName( "sex")
+        @JSONField(name = "sex")
         private String sex;
 
-        @SerializedName( "age")
+        @JSONField(name = "age")
         private int age;
 
-        @SerializedName( "area")
+        @JSONField(name = "area")
         private String area;
 
-        @SerializedName( "level")
+        @JSONField(name = "level")
         private String level;
 
-        @SerializedName( "role")
+        @JSONField(name = "role")
         private String role;
 
-        @SerializedName( "title")
+        @JSONField(name = "title")
         private String title;
 
     }

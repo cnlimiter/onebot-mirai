@@ -1,35 +1,35 @@
 package cn.evolvefield.mirai.onebot.dto.response.guild;
 
 import cn.evolvefield.mirai.onebot.dto.event.message.GuildMessageEvent;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 
 @Data
 public class GetGuildMsgResp {
 
-    @SerializedName( "guild_id")
+    @JSONField(name = "guild_id")
     private String guildId;
 
-    @SerializedName( "channel_id")
+    @JSONField(name = "channel_id")
     private String channelId;
 
-    @SerializedName( "message")
+    @JSONField(name = "message")
     private String message;
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private String messageId;
 
-    @SerializedName( "message_seq")
+    @JSONField(name = "message_seq")
     private int messageSeq;
 
-    @SerializedName( "message_source")
+    @JSONField(name = "message_source")
     private String messageSource;
 
-    @SerializedName( "sender")
+    @JSONField(name = "sender")
     private GuildMessageEvent.Sender sender;
 
-    @SerializedName( "time")
+    @JSONField(name = "time")
     private long time;
 
 }

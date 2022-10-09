@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.message;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,13 +22,13 @@ import net.mamoe.mirai.contact.NormalMember;
 @EqualsAndHashCode(callSuper = true)
 public class PrivateMessageEvent extends MessageEvent {
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private int messageId;
 
-    @SerializedName( "sub_type")
+    @JSONField(name = "sub_type")
     private String subType;
 
-    @SerializedName( "sender")
+    @JSONField(name = "sender")
     private PrivateSender privateSender;
 
     /**
@@ -48,16 +48,16 @@ public class PrivateMessageEvent extends MessageEvent {
             this.age = sender.queryProfile().getAge();
             this.sex = sender.queryProfile().getSex().name().toLowerCase();
         }
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private long userId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
-        @SerializedName( "sex")
+        @JSONField(name = "sex")
         private String sex;
 
-        @SerializedName( "age")
+        @JSONField(name = "age")
         private int age;
 
     }

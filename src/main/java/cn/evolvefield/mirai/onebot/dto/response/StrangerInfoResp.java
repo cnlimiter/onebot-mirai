@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -14,43 +14,43 @@ public class StrangerInfoResp {
     /**
      * QQ 号
      */
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
     /**
      * 昵称
      */
-    @SerializedName( "nickname")
+    @JSONField(name = "nickname")
     private String nickname;
 
     /**
      * 性别 male 或 female 或 unknown
      */
-    @SerializedName( "sex")
+    @JSONField(name = "sex")
     private String sex;
 
     /**
      * 年龄
      */
-    @SerializedName( "age")
+    @JSONField(name = "age")
     private int age;
 
     /**
      * qid id 身份卡
      */
-    @SerializedName( "qid")
+    @JSONField(name = "qid")
     private String qid;
 
     /**
      * 等级
      */
-    @SerializedName( "level")
+    @JSONField(name = "level")
     private int level;
 
     /**
      * 在线天数？我猜的（
      */
-    @SerializedName( "login_days")
+    @JSONField(name = "login_days")
     private int loginDays;
 
 }

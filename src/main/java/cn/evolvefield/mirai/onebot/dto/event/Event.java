@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +18,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class Event {
 
-    @SerializedName("post_type")
+    @JSONField(name = "post_type")
     private String postType;
 
-    @SerializedName( "time")
+    @JSONField(name = "time")
     private long time;
 
-    @SerializedName( "self_id")
+    @JSONField(name = "self_id")
     private long selfId;
 
 }

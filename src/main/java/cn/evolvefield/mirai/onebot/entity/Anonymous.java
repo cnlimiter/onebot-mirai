@@ -1,18 +1,18 @@
 package cn.evolvefield.mirai.onebot.entity;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 @Data
 public class Anonymous {
 
-    @SerializedName( "id")
+    @JSONField(name =  "id")
     private long id;
 
-    @SerializedName( "name")
+    @JSONField(name =  "name")
     private String name;
 
-    @SerializedName( "flag")
+    @JSONField(name =  "flag")
     private String flag;
 
 }

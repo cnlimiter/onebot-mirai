@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -9,13 +9,13 @@ import lombok.Data;
 @Data
 public class UnidirectionalFriendListResp {
 
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
-    @SerializedName( "nickname")
+    @JSONField(name = "nickname")
     private String nickname;
 
-    @SerializedName( "source")
+    @JSONField(name = "source")
     private String source;
 
 }

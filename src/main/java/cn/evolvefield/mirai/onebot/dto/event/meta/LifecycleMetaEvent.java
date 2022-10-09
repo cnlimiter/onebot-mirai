@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event.meta;
 
 import cn.evolvefield.mirai.onebot.dto.event.Event;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class LifecycleMetaEvent extends MetaEvent {
 
-    @SerializedName("sub_type")
+    @JSONField(name = "sub_type")
     private String subType;// enable、disable、connect
 
     public LifecycleMetaEvent(long selfId, String subType, long time){

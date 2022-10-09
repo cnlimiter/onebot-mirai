@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
 import cn.evolvefield.mirai.onebot.dto.event.Event;
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,10 +20,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class NoticeEvent extends Event {
 
-    @SerializedName( "notice_type")
+    @JSONField(name = "notice_type")
     private String noticeType;
 
-    @SerializedName( "user_id")
+    @JSONField(name = "user_id")
     private long userId;
 
 }

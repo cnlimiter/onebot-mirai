@@ -30,7 +30,7 @@ public abstract class FastWSServer implements WebSocketServer {
         server.channel(NioServerSocketChannel.class);
         server.childHandler(config.getChildHandler());
 
-        ChannelFuture future = server.bind(config.getPort());
+        ChannelFuture future = server.bind(config.getUrl(), config.getPort());
         future.addListener(f -> {
             if (f.isDone() && f.isSuccess()) {
                 this.serverChannel = future.channel();
@@ -41,6 +41,24 @@ public abstract class FastWSServer implements WebSocketServer {
             if (f.isDone() && f.cause() != null) {
                 log.error("启动WS服务器失败,抛出={}", f.cause().getMessage());
                 future.channel().close();
+            }
+        });
+    }
+    public void start(final String url, final int port) {
+        start(new WSServerConfig() {
+            @Override
+            public ChannelHandler getChildHandler() {
+                return new WebSocketChannelInitializer(FastWSServer.this);
+            }
+
+            @Override
+            public int getPort() {
+                return port;
+            }
+
+            @Override
+            public String getUrl() {
+                return url;
             }
         });
     }
@@ -55,6 +73,11 @@ public abstract class FastWSServer implements WebSocketServer {
             @Override
             public int getPort() {
                 return port;
+            }
+
+            @Override
+            public String getUrl() {
+                return WSServerConfig.super.getUrl();
             }
         });
     }

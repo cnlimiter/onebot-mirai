@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class BooleanResp {
 
-    @SerializedName( "yes")
+    @JSONField(name = "yes")
     private boolean yes;
 
 }

@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,10 +19,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class GroupUploadNoticeEvent extends NoticeEvent {
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "file")
+    @JSONField(name = "file")
     private File file;
 
     /**
@@ -31,16 +31,16 @@ public class GroupUploadNoticeEvent extends NoticeEvent {
     @Data
     public static class File {
 
-        @SerializedName( "id")
+        @JSONField(name = "id")
         private String id;
 
-        @SerializedName( "name")
+        @JSONField(name = "name")
         private String name;
 
-        @SerializedName( "size")
+        @JSONField(name = "size")
         private long size;
 
-        @SerializedName( "busid")
+        @JSONField(name = "busid")
         private long busid;
 
     }

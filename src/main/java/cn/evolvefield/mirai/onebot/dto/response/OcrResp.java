@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
 @Data
 public class OcrResp {
 
-    @SerializedName( "texts")
+    @JSONField(name = "texts")
     private List<TextDetection> texts;
 
-    @SerializedName( "language")
+    @JSONField(name = "language")
     private String language;
 
     @Data
@@ -23,19 +23,19 @@ public class OcrResp {
         /**
          * 文本
          */
-        @SerializedName( "text")
+        @JSONField(name = "text")
         private String text;
 
         /**
          * 置信度
          */
-        @SerializedName( "confidence")
+        @JSONField(name = "confidence")
         private int confidence;
 
         /**
          * 坐标
          */
-        @SerializedName( "coordinates")
+        @JSONField(name = "coordinates")
         private int[][] coordinates;
 
     }

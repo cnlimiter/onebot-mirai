@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.response.group;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -13,25 +13,25 @@ import java.util.List;
 @Data
 public class GroupHonorInfoResp {
 
-    @SerializedName( "group_id")
+    @JSONField(name = "group_id")
     private long groupId;
 
-    @SerializedName( "current_talkative")
+    @JSONField(name = "current_talkative")
     private CurrentTalkative currentTalkative;
 
-    @SerializedName( "talkative_list")
+    @JSONField(name = "talkative_list")
     private List<OtherHonor> talkativeList;
 
-    @SerializedName( "performer_list")
+    @JSONField(name = "performer_list")
     private List<OtherHonor> performerList;
 
-    @SerializedName( "legend_list")
+    @JSONField(name = "legend_list")
     private List<OtherHonor> legendList;
 
-    @SerializedName( "strong_newbie_list")
+    @JSONField(name = "strong_newbie_list")
     private List<OtherHonor> strongNewbieList;
 
-    @SerializedName( "emotion_list")
+    @JSONField(name = "emotion_list")
     private List<OtherHonor> emotionList;
 
     /**
@@ -40,16 +40,16 @@ public class GroupHonorInfoResp {
     @Data
     public static class CurrentTalkative {
 
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private long userId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
-        @SerializedName( "avatar")
+        @JSONField(name = "avatar")
         private String avatar;
 
-        @SerializedName( "day_count")
+        @JSONField(name = "day_count")
         private int dayCount;
 
     }
@@ -60,16 +60,16 @@ public class GroupHonorInfoResp {
     @Data
     public static class OtherHonor {
 
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private long userId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
-        @SerializedName( "avatar")
+        @JSONField(name = "avatar")
         private String avatar;
 
-        @SerializedName( "description")
+        @JSONField(name = "description")
         private String description;
 
     }

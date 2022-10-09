@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.message;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,22 +19,22 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class GuildMessageEvent extends MessageEvent {
 
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private String messageId;
 
-    @SerializedName( "sub_type")
+    @JSONField(name = "sub_type")
     private String subType;
 
-    @SerializedName( "guild_id")
+    @JSONField(name = "guild_id")
     private String guildId;
 
-    @SerializedName( "channel_id")
+    @JSONField(name = "channel_id")
     private String channelId;
 
-    @SerializedName( "self_tiny_id")
+    @JSONField(name = "self_tiny_id")
     private String selfTinyId;
 
-    @SerializedName( "sender")
+    @JSONField(name = "sender")
     private Sender sender;
 
     /**
@@ -43,13 +43,13 @@ public class GuildMessageEvent extends MessageEvent {
     @Data
     public static class Sender {
 
-        @SerializedName( "user_id")
+        @JSONField(name = "user_id")
         private long userId;
 
-        @SerializedName( "tiny_id")
+        @JSONField(name = "tiny_id")
         private String tinyId;
 
-        @SerializedName( "nickname")
+        @JSONField(name = "nickname")
         private String nickname;
 
     }

@@ -1,6 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
-import com.google.gson.annotations.SerializedName;
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,19 +22,19 @@ public class MessageReactionsUpdatedNoticeEvent extends NoticeEvent {
     /**
      * 频道ID
      */
-    @SerializedName( "guild_id")
+    @JSONField(name = "guild_id")
     private String guildId;
 
     /**
      * 子频道ID
      */
-    @SerializedName( "channel_id")
+    @JSONField(name = "channel_id")
     private String channelId;
 
     /**
      * 消息ID
      */
-    @SerializedName( "message_id")
+    @JSONField(name = "message_id")
     private String messageId;
 
     /**
@@ -48,37 +48,37 @@ public class MessageReactionsUpdatedNoticeEvent extends NoticeEvent {
         /**
          * 表情ID
          */
-        @SerializedName( "emoji_id")
+        @JSONField(name = "emoji_id")
         private String emojiId;
 
         /**
          * 表情对应数值ID
          */
-        @SerializedName( "emoji_index")
+        @JSONField(name = "emoji_index")
         private int emojiIndex;
 
         /**
          * 表情类型
          */
-        @SerializedName( "emoji_type")
+        @JSONField(name = "emoji_type")
         private int emojiType;
 
         /**
          * 表情名字
          */
-        @SerializedName( "emoji_name")
+        @JSONField(name = "emoji_name")
         private String emojiName;
 
         /**
          * 当前表情被贴数量
          */
-        @SerializedName( "count")
+        @JSONField(name = "count")
         private int count;
 
         /**
          * BOT是否点击
          */
-        @SerializedName( "clicked")
+        @JSONField(name = "clicked")
         private boolean clicked;
 
     }
