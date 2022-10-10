@@ -20,7 +20,7 @@ public class OnebotWebSocketServer extends FastWSServer {
 
 
 
-    public OnebotWebSocketServer INSTANCE = this;
+    public OnebotWebSocketServer INSTANCE;
 
     private final BotSession botSession;
     private final PluginConfig.BotConfig botConfig;
@@ -30,6 +30,7 @@ public class OnebotWebSocketServer extends FastWSServer {
     public OnebotWebSocketServer(BotSession botSession){
         this.botSession = botSession;
         this.botConfig = botSession.getBotConfig();
+        this.INSTANCE = this;
     }
 
     public void startWS(){
@@ -45,12 +46,12 @@ public class OnebotWebSocketServer extends FastWSServer {
     public void onMessage(WebSocketSession session, String message) {
 
         try {
-            OneBotMirai.logger.debug("Bot: ${session.bot.id} 正向Websocket服务端 / 开始处理API请求");
+            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
 
             ActionUtils.handleWebSocketActions(session, botSession.getApiImpl(), message);
 
         } finally {
-            OneBotMirai.logger.debug("Bot: ${session.bot.id} 正向Websocket服务端 / 连接被关闭");
+            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
             botSession.unsubscribeEvent(listener);
         }
     }

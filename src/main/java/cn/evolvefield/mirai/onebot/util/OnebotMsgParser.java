@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.util;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.mamoe.mirai.Bot;
@@ -23,30 +24,25 @@ public class OnebotMsgParser {
 
     private static final PlainText MSG_EMPTY = new PlainText("");
 
-//    public static MessageChain messageToMiraiMessageChains(Bot bot, Contact contact, Object message, boolean raw){
-//        if (message instanceof String s){
-//            return raw ?  new MessageChainBuilder().append(new PlainText(s)).build() : codeToChain(bot, s, contact);
-//        }
-//        else if (message instanceof JsonArray array){
-//            var messageChain = new MessageChainBuilder();
-//            array.forEach(
-//                    jsonElement -> {
-//                        try {
-//                            var data = jsonElement.getAsJsonObject().get("data").getAsJsonObject();
-//                            when (msg.jsonObject["type"]?.jsonPrimitive?.content) {
-//                                "text" -> messageChain += PlainText(data!!.jsonObject["text"]!!.jsonPrimitive.content)
-//                        else -> messageChain += textToMessageInternal(bot, contact, msg)
-//                            }
-//                        } catch (NullPointerException e) {
-//                            OneBotMirai.logger.warning("Got null when parsing CQ message array");
-//                            continue;
-//                        }
-//                    }
-//            );
-//
-//            return messageChain.build();
-//        }
-//    }
+    public static MessageChain messageToMiraiMessageChains(Bot bot, Contact contact, Object message, boolean raw){
+        if (message instanceof String s){
+            return new MessageChainBuilder().append(new PlainText(s)).build();
+        }
+        else if (message instanceof JSONObject jsonObject) {
+            try {
+                var data = jsonObject.getJSONObject("data");
+                if (jsonObject.getJSONObject("type") != null){
+                    if (data.containsKey("text"))
+                        return new MessageChainBuilder().append(new PlainText(data.getJSONObject("text").toString())).build();
+                    else return new MessageChainBuilder().append(textToMessageInternal(bot, contact, message)).build();
+                }
+            } catch (NullPointerException e) {
+                OneBotMirai.logger.warning("Got null when parsing CQ message object");
+                return null;
+            }
+        }
+        return null;
+    }
 
      public static String toCQString(SingleMessage message){
         if (message instanceof PlainText text) return escape(text.getContent());
@@ -166,29 +162,30 @@ public class OnebotMsgParser {
         return map;
     }
 
-//    private static Message textToMessageInternal(Bot bot, Contact contact, Object message){
-//        if (message instanceof String msg){
-//            if (msg.startsWith("[CQ:") && msg.endsWith("]")) {
-//                var parts = msg.substring(4, msg.length() - 1).split(",",  2);
-//
-//                HashMap<String, String> args;
-//                if (parts.length == 2) {
-//                    args = toMap(parts[1]);
-//                } else {
-//                   args = new HashMap<>();
-//                }
-//                return convertToMiraiMessage(bot, contact, parts[0], args);
-//            }
-//            return new PlainText(unescape(msg));
-//        }
-//        else if (message instanceof JsonObject jsonObject){
-//            var type = jsonObject.get("type").getAsString();
-//            var data = jsonObject.get("data").getAsJsonObject().isJsonNull() ? MSG_EMPTY : jsonObject.get("data").getAsJsonObject();
-//            //var args = data..associateWith { data.jsonObject[it]!!.jsonPrimitive.content }
-//            return convertToMiraiMessage(bot, contact, type, args);
-//        }
-//        else return MSG_EMPTY;
-//    }
+    private static Message textToMessageInternal(Bot bot, Contact contact, Object message){
+        if (message instanceof String msg){
+            if (msg.startsWith("[CQ:") && msg.endsWith("]")) {
+                var parts = msg.substring(4, msg.length() - 1).split(",",  2);
+
+                HashMap<String, String> args;
+                if (parts.length == 2) {
+                    args = toMap(parts[1]);
+                } else {
+                   args = new HashMap<>();
+                }
+                return convertToMiraiMessage(bot, contact, parts[0], args);
+            }
+            return new PlainText(unescape(msg));
+        }
+        else if (message instanceof JSONObject jsonObject){
+            var type = jsonObject.getJSONObject("type").toString();
+            JSONObject data = jsonObject.getJSONObject("data");
+            Map<String, String> args = new HashMap<>();
+            data.forEach((s, o) -> args.put(s, (String) o));
+            return convertToMiraiMessage(bot, contact, type, args);
+        }
+        else return MSG_EMPTY;
+    }
 
 
     private static Message convertToMiraiMessage(Bot bot, Contact contact, String type, Map<String, String> args){
