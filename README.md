@@ -2,7 +2,7 @@
 
 # OneBot Mirai
 
-_✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)标准的mirai 插件版 *(原cqhttp-mirai)*✨_
+_✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)标准的mirai 插件版 *原cqhttp-mirai*✨_
 </div>
 <hr>
 <p align="center">
