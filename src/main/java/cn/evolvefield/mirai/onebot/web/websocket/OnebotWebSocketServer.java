@@ -4,11 +4,8 @@ import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.BotSession;
 import cn.evolvefield.mirai.onebot.util.ActionUtils;
-import cn.evolvefield.mirai.onebot.web.websocket.common.WSServerConfig;
 import cn.evolvefield.mirai.onebot.web.websocket.core.FastWSServer;
 import cn.evolvefield.mirai.onebot.web.websocket.core.WebSocketSession;
-import io.netty.channel.ChannelHandler;
-import okhttp3.Route;
 
 /**
  * Description:
@@ -44,7 +41,6 @@ public class OnebotWebSocketServer extends FastWSServer {
 
     @Override
     public void onMessage(WebSocketSession session, String message) {
-
         try {
             OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
 
