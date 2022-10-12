@@ -1,7 +1,6 @@
 package cn.evolvefield.mirai.onebot.dto.event.notice;
 
-import cn.evolvefield.mirai.onebot.dto.response.ChannelInfoResp;
-import com.alibaba.fastjson2.annotation.JSONField;
+import cn.evolvefield.mirai.onebot.dto.response.guild.ChannelInfoResp;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -4,6 +4,7 @@ import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.SessionManager;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.event.Event;
 import net.mamoe.mirai.event.GlobalEventChannel;
@@ -20,10 +21,7 @@ public final class OneBotMirai extends JavaPlugin {
     private Listener<? extends Event> initialSubscription = null;
 
     private OneBotMirai() {
-        super(new JvmPluginDescriptionBuilder("cn.evolvefield.mirai.onebot", "0.1.0")
-                .name("OneBot Mirai")
-                .author("cnlimiter")
-                .build());
+        super(JvmPluginDescription.loadFromResource());
     }
 
     @Override

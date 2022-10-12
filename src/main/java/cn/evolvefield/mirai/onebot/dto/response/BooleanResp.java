@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.dto.response;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @author cnlimiter
  */
 @Data
+@AllArgsConstructor
 public class BooleanResp {
 
     @JSONField(name = "yes")

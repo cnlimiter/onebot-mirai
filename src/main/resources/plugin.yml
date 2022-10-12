@@ -1,0 +1,7 @@
+id: cn.evolvefield.mirai.onebot
+main: cn.evolvefield.mirai.onebot.OneBotMirai
+version: 0.1.3
+name: OneBot_Mirai
+author: cnlimiter
+dependencies: [ ]
+info: 基于 [OneBot]标准的mirai 插件版

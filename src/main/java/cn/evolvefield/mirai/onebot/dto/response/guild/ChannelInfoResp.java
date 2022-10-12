@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.dto.response;
+package cn.evolvefield.mirai.onebot.dto.response.guild;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
