@@ -1,7 +1,10 @@
 package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
-import cn.evolvefield.mirai.onebot.dto.response.*;
+import cn.evolvefield.mirai.onebot.dto.response.ActionData;
+import cn.evolvefield.mirai.onebot.dto.response.ActionList;
+import cn.evolvefield.mirai.onebot.dto.response.BooleanResp;
+import cn.evolvefield.mirai.onebot.dto.response.MessageResponse;
 import cn.evolvefield.mirai.onebot.dto.response.contact.FriendInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.contact.LoginInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.contact.StrangerInfoResp;
@@ -20,20 +23,20 @@ import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.LowLevelApi;
 import net.mamoe.mirai.Mirai;
-import net.mamoe.mirai.contact.*;
+import net.mamoe.mirai.contact.Contact;
+import net.mamoe.mirai.contact.MemberPermission;
+import net.mamoe.mirai.contact.PermissionDeniedException;
 import net.mamoe.mirai.contact.announcement.OfflineAnnouncement;
-import net.mamoe.mirai.data.GroupHonorListData;
-import net.mamoe.mirai.data.GroupHonorType;
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent;
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent;
 import net.mamoe.mirai.event.events.NewFriendRequestEvent;
 import net.mamoe.mirai.message.data.MessageSource;
 import net.mamoe.mirai.utils.MiraiExperimentalApi;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static net.mamoe.mirai.contact.announcement.OfflineAnnouncementKt.OfflineAnnouncement;
 
 /**
  * Description:
@@ -355,7 +358,7 @@ public class MiraiApi {
         bot.getFriends().forEach(friend -> {
             friendList.add(new FriendInfoResp(friend.getId(), friend.getNick(), friend.getRemark()));
         });
-        var data = new ActionData<LinkedList<FriendInfoResp>>();
+        var data = new ActionList<>();
         data.setData(friendList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -367,7 +370,7 @@ public class MiraiApi {
         bot.getGroups().forEach(group ->
                 groupList.add(new GroupDataResp(group.getId(), group.getName()))); {
         }
-        var data = new ActionData<LinkedList<GroupDataResp>>();
+        var data = new ActionList<>();
         data.setData(groupList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -450,7 +453,7 @@ public class MiraiApi {
     public ActionData<?> getGroupMemberList(JSONObject params){
         var groupId = params.getLong("group_id");
         var groupMemberListData = new LinkedList<GroupMemberInfoResp>();
-        var data = new ActionData<LinkedList<GroupMemberInfoResp>>();
+        var data = new ActionList<>();
 
         AtomicBoolean isBotIncluded = new AtomicBoolean(false);
         var group = bot.getGroupOrFail(groupId);

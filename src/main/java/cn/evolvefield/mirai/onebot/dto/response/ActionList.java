@@ -2,6 +2,8 @@ package cn.evolvefield.mirai.onebot.dto.response;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -12,7 +14,8 @@ import java.util.List;
  * Version: 1.0
  */
 @Data
-public class ActionList<T> {
+@EqualsAndHashCode(callSuper = true)
+public class ActionList<T> extends ActionData<T>{
 
     @JSONField(name = "status")
     private String status;
