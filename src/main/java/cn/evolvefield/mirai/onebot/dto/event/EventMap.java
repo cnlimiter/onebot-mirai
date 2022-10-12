@@ -255,7 +255,7 @@ public class EventMap {
                 return event;
             }
             else {
-                logger.info(String.format("私聊被戳事件已被插件忽略: %s", this));
+                logger.info(String.format("私聊被戳事件已被插件忽略: %s", nudgeEvent));
                 return new IgnoreEvent(nudgeEvent.getBot().getId());
             }
         }
@@ -281,7 +281,7 @@ public class EventMap {
                 return event;
             }
             else {
-                logger.info(String.format("发生讨论组消息撤回事件, 已被插件忽略: %s", this));
+                logger.info(String.format("发生讨论组消息撤回事件, 已被插件忽略: %s", recallEvent));
                 return new IgnoreEvent(recallEvent.getBot().getId());
             }
         }
@@ -295,7 +295,7 @@ public class EventMap {
             return event;
         }
         else {
-            logger.info(String.format("发生了被插件忽略的事件: %s", this));
+            logger.info(String.format("发生了被插件忽略的事件: %s", botEvent));
             return new IgnoreEvent(botEvent.getBot().getId());
         }
 
@@ -303,7 +303,7 @@ public class EventMap {
     }
 
 
-    private long optOpId(Member op, Bot bot){
+    private static long optOpId(Member op, Bot bot){
         if (op != null) return op.getId();
         else return bot.getId();
     }

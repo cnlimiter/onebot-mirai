@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,8 +15,7 @@ import java.util.List;
  * Version: 1.0
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ActionList<T> extends ActionData<T>{
+public class ActionList<T>{
 
     @JSONField(name = "status")
     private String status;
@@ -24,6 +24,6 @@ public class ActionList<T> extends ActionData<T>{
     private int retCode;
 
     @JSONField(name = "data")
-    private List<T> data;
+    private LinkedList<T> data;
 
 }

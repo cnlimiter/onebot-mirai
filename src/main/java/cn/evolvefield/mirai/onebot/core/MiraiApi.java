@@ -2,7 +2,6 @@ package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.dto.response.ActionData;
-import cn.evolvefield.mirai.onebot.dto.response.ActionList;
 import cn.evolvefield.mirai.onebot.dto.response.BooleanResp;
 import cn.evolvefield.mirai.onebot.dto.response.MessageResponse;
 import cn.evolvefield.mirai.onebot.dto.response.contact.FriendInfoResp;
@@ -358,7 +357,7 @@ public class MiraiApi {
         bot.getFriends().forEach(friend -> {
             friendList.add(new FriendInfoResp(friend.getId(), friend.getNick(), friend.getRemark()));
         });
-        var data = new ActionList<>();
+        var data = new ActionData<>();
         data.setData(friendList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -370,7 +369,7 @@ public class MiraiApi {
         bot.getGroups().forEach(group ->
                 groupList.add(new GroupDataResp(group.getId(), group.getName()))); {
         }
-        var data = new ActionList<>();
+        var data = new ActionData<>();
         data.setData(groupList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -453,7 +452,7 @@ public class MiraiApi {
     public ActionData<?> getGroupMemberList(JSONObject params){
         var groupId = params.getLong("group_id");
         var groupMemberListData = new LinkedList<GroupMemberInfoResp>();
-        var data = new ActionList<>();
+        var data = new ActionData<>();
 
         AtomicBoolean isBotIncluded = new AtomicBoolean(false);
         var group = bot.getGroupOrFail(groupId);

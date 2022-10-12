@@ -21,20 +21,23 @@ public final class OneBotMirai extends JavaPlugin {
     private Listener<? extends Event> initialSubscription = null;
 
     private OneBotMirai() {
-        super(JvmPluginDescription.loadFromResource());
+        super(new JvmPluginDescriptionBuilder("cn.evolvefield.mirai.onebot", "0.1.3")
+                .name("OneBot Mirai")
+                .author("cnlimiter")
+                .build());
+        //super(JvmPluginDescription.loadFromResource("plugin.yml"));
     }
 
     @Override
     public void onEnable() {
         logger.info("Plugin loaded!");
-        this.config = new PluginConfig();
-        this.reloadPluginData(config);
+        this.reloadPluginData(PluginConfig.INSTANCE);
         logger.info("Plugin loaded!");
-        logger.info("插件当前Commit 版本: 0.1.2 ");
+        logger.info("插件当前Commit 版本: 0.1.3");
         Bot.getInstances().forEach(bot -> {
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
-                if (PluginConfig.bots.containsKey(String.valueOf(bot.getId()))){
-                    SessionManager.createBotSession(bot, PluginConfig.bots.get(String.valueOf(bot.getId())));
+                if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(bot.getId()))){
+                    SessionManager.createBotSession(bot, PluginConfig.INSTANCE.bots.get().get(String.valueOf(bot.getId())));
                 }
                 else {
                     logger.debug(String.format("%s 未进行onebot配置", bot.getId()));
@@ -51,8 +54,8 @@ public final class OneBotMirai extends JavaPlugin {
             }
             if (event instanceof BotOnlineEvent onlineEvent){
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
-                    if (PluginConfig.bots.containsKey(String.valueOf(event.getBot().getId()))){
-                        SessionManager.createBotSession(event.getBot(), PluginConfig.bots.get(String.valueOf(event.getBot().getId())));
+                    if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(event.getBot().getId()))){
+                        SessionManager.createBotSession(event.getBot(), PluginConfig.INSTANCE.bots.get().get(String.valueOf(event.getBot().getId())));
                     }
                     else {
                         logger.debug(String.format("%s 未进行onebot配置", event.getBot().getId()));
@@ -61,7 +64,7 @@ public final class OneBotMirai extends JavaPlugin {
 
             }
             else if (event instanceof MessageEvent messageEvent){
-                if (!SessionManager.containsSession(messageEvent.getBot().getId())) {
+                if (SessionManager.containsSession(messageEvent.getBot().getId())) {
                     var session = SessionManager.get(messageEvent.getBot().getId());
                     if (messageEvent instanceof GroupMessageEvent groupMessageEvent){
                         session.getApiImpl().getCachedSourceQueue().add(groupMessageEvent.getSource());
@@ -73,19 +76,19 @@ public final class OneBotMirai extends JavaPlugin {
                 }
             }
             else if (event instanceof NewFriendRequestEvent requestEvent) {
-                if (!SessionManager.containsSession(requestEvent.getBot().getId())) {
+                if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     var session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
             }
             else if (event instanceof MemberJoinRequestEvent requestEvent) {
-                if (!SessionManager.containsSession(requestEvent.getBot().getId())) {
+                if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     var session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
             }
             else if (event instanceof BotInvitedJoinGroupRequestEvent requestEvent) {
-                if (!SessionManager.containsSession(requestEvent.getBot().getId())) {
+                if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     var session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }

@@ -1,5 +1,6 @@
 package cn.evolvefield.mirai.onebot.core;
 
+import cn.evolvefield.mirai.onebot.config.BotConfig;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import net.mamoe.mirai.Bot;
 
@@ -35,7 +36,7 @@ public class SessionManager{
     }
 
 
-    public static BotSession createBotSession(Bot bot, PluginConfig.BotConfig botConfig){
+    public static BotSession createBotSession(Bot bot, BotConfig botConfig){
         var session = new BotSession(bot, botConfig);
         sessions.put(bot.getId(), session);
         return session;

@@ -1,6 +1,7 @@
 package cn.evolvefield.mirai.onebot.web.websocket;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
+import cn.evolvefield.mirai.onebot.config.BotConfig;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.BotSession;
 import cn.evolvefield.mirai.onebot.util.ActionUtils;
@@ -20,7 +21,7 @@ public class OnebotWebSocketServer extends FastWSServer {
     public OnebotWebSocketServer INSTANCE;
 
     private final BotSession botSession;
-    private final PluginConfig.BotConfig botConfig;
+    private final BotConfig botConfig;
 
     private String listener;
 
@@ -31,7 +32,7 @@ public class OnebotWebSocketServer extends FastWSServer {
     }
 
     public void startWS(){
-        super.start(botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort());
+        super.start(botConfig.getWsHost(), botConfig.getWsPort());
     }
 
     @Override
