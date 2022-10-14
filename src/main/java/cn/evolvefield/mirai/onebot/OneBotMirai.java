@@ -1,5 +1,6 @@
 package cn.evolvefield.mirai.onebot;
 
+import cn.evolvefield.mirai.onebot.config.BotConfig;
 import cn.evolvefield.mirai.onebot.config.PluginConfig;
 import cn.evolvefield.mirai.onebot.core.SessionManager;
 import net.mamoe.mirai.Bot;
@@ -36,8 +37,14 @@ public final class OneBotMirai extends JavaPlugin {
         logger.info("插件当前Commit 版本: 0.1.3");
         Bot.getInstances().forEach(bot -> {
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
-                if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(bot.getId()))){
-                    SessionManager.createBotSession(bot, PluginConfig.INSTANCE.bots.get().get(String.valueOf(bot.getId())));
+                var botId = String.valueOf(bot.getId());
+                if (PluginConfig.INSTANCE.bots.get().containsKey(botId)){
+                    var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
+                    for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
+                        if (mapConfig.get(name).getEnable())
+                            SessionManager.createBotSession(bot, PluginConfig.INSTANCE.bots.get().get(botId).get(name));
+
+                    }
                 }
                 else {
                     logger.debug(String.format("%s 未进行onebot配置", bot.getId()));
@@ -54,9 +61,14 @@ public final class OneBotMirai extends JavaPlugin {
             }
             if (event instanceof BotOnlineEvent onlineEvent){
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
+                    var botId = String.valueOf(onlineEvent.getBot().getId());
                     if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(event.getBot().getId()))){
-                        SessionManager.createBotSession(event.getBot(), PluginConfig.INSTANCE.bots.get().get(String.valueOf(event.getBot().getId())));
-                    }
+                        var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
+                        for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
+                            if (mapConfig.get(name).getEnable())
+                                SessionManager.createBotSession(onlineEvent.getBot(), PluginConfig.INSTANCE.bots.get().get(botId).get(name));
+
+                        }                    }
                     else {
                         logger.debug(String.format("%s 未进行onebot配置", event.getBot().getId()));
                     }

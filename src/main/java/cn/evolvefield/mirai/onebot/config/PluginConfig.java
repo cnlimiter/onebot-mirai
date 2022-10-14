@@ -22,12 +22,15 @@ public class PluginConfig extends JavaAutoSavePluginConfig {
 
     }
 
-    public final Value<Map<String, BotConfig>> bots = typedValue("bots",
-            createKType(Map.class, createKType(String.class), createKType(BotConfig.class)),
+    public final Value<Map<String, HashMap<String, BotConfig>>> bots = typedValue("bots",
+            createKType(Map.class, createKType(String.class), createKType(HashMap.class)),
             new HashMap<>() {{
-                put("123454321", new BotConfig());
+                put("123454321", new HashMap<>() {{
+                    put("ws", new BotConfig());
+                }});
             }}
     );
+
 
     @Data
     public static class DBConfig{
