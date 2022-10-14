@@ -44,7 +44,7 @@ public class MessageMap {
                 anonymous1.setName(anonymous.getNameCard());
                 event.setAnonymous(anonymous1);;
             }
-            else return null;
+            else event.setAnonymous(null);
             event.setMessage(rawMessage[0]);
             event.setRawMessage(rawMessage[0]);
             event.setFont(0);
