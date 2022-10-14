@@ -704,8 +704,16 @@ public class MiraiApi {
     public ActionData<?> setEssenceMsg(JSONObject params) {
         var groupId = params.getLong("group_id");
         var messageId = params.getInteger("message_id");
-        //bot.getGroupOrFail(groupId).setEssenceMessage()
+        bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
         return new GeneralSuccess();
+
+    }
+
+    public ActionData<?> deleteEssenceMsg(JSONObject params) {
+        var groupId = params.getLong("group_id");
+        var messageId = params.getInteger("message_id");
+        bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
+        return new GeneralSuccess();//todo 等待mirai的api
 
     }
 
