@@ -7,7 +7,7 @@ import net.mamoe.mirai.Bot;
 import java.util.LinkedHashMap;
 
 /**
- * Description:
+ * Description:客户端连接管理器
  * Author: cnlimiter
  * Date: 2022/10/8 19:34
  * Version: 1.0
@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 public class SessionManager{
 
 
-    private static final LinkedHashMap<Long, BotSession> sessions = new LinkedHashMap<>();
+    private static final LinkedHashMap<Long, BotSession> sessions = new LinkedHashMap<>();//一个机器人对应一个websocket连接
 
     public static LinkedHashMap<Long, BotSession> getSessions() {
         return sessions;

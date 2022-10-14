@@ -2,8 +2,10 @@ package cn.evolvefield.mirai.onebot.entity;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class Anonymous {
 
     @JSONField(name =  "id")

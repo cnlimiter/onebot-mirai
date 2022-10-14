@@ -43,13 +43,4 @@ public class PluginConfig extends JavaAutoSavePluginConfig {
         long interval = 1500L;
     }
 
-    @Data
-    @NoArgsConstructor
-    public static class WebsocketServerSettings{
-        boolean enable = false;
-        String postMessageFormat = "string";
-        String wsHost = "0.0.0.0";
-        int wsPort = 8080;
-        String accessToken = "";
-    }
 }

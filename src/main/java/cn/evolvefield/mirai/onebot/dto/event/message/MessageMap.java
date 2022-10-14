@@ -13,7 +13,7 @@ import net.mamoe.mirai.event.events.MessageEvent;
 import java.io.Serializable;
 
 /**
- * Description:
+ * Description:消息转换器
  * Author: cnlimiter
  * Date: 2022/10/4 23:48
  * Version: 1.0
@@ -44,7 +44,7 @@ public class MessageMap {
                 anonymous1.setName(anonymous.getNameCard());
                 event.setAnonymous(anonymous1);;
             }
-            else event.setAnonymous(null);
+            else event.setAnonymous(new Anonymous());
             event.setMessage(rawMessage[0]);
             event.setRawMessage(rawMessage[0]);
             event.setFont(0);

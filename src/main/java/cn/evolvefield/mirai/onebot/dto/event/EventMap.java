@@ -14,7 +14,7 @@ import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.utils.MiraiLogger;
 
 /**
- * Description:事件转换
+ * Description:事件转换器
  * Author: cnlimiter
  * Date: 2022/10/4 21:08
  * Version: 1.0
