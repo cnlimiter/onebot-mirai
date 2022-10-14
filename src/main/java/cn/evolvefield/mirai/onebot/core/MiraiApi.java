@@ -51,59 +51,151 @@ public class MiraiApi {
     private final CacheRequestQueue cacheRequestQueue = new CacheRequestQueue();
     @Getter
     private final CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
-    public MiraiApi(Bot bot){
+
+    public MiraiApi(Bot bot) {
         this.bot = bot;
     }
 
-    public ActionData<?> callMiraiApi(String action, JSONObject params, MiraiApi mirai){
+    public ActionData<?> callMiraiApi(String action, JSONObject params, MiraiApi mirai) {
         ActionData<?> responseDTO = new PluginFailure();
 
         try {
             switch (action) {
-                case "send_msg" -> {responseDTO=mirai.sendMessage(params);}
-                case "send_private_msg" -> {responseDTO=mirai.sendPrivateMessage(params);}
-                case "send_group_msg" -> {responseDTO=mirai.sendGroupMessage(params);}
-                case "send_discuss_msg" -> {responseDTO=mirai.sendDiscussMessage(params);}
-                case "delete_msg" -> {responseDTO=mirai.deleteMessage(params);}
-                case "send_like" -> {responseDTO=mirai.sendLike(params);}
-                case "set_group_kick" -> {responseDTO=mirai.setGroupKick(params);}
-                case "set_group_ban" -> {responseDTO=mirai.setGroupBan(params);}
-                case "set_group_anonymous_ban" -> {responseDTO=mirai.setGroupAnonymousBan(params);}
-                case "set_group_whole_ban" -> {responseDTO=mirai.setWholeGroupBan(params);}
-                case "set_group_admin" -> {responseDTO=mirai.setGroupAdmin(params);}
-                case "set_group_anonymous" -> {responseDTO=mirai.setGroupAnonymous(params);}
-                case "set_group_card" -> {responseDTO=mirai.setGroupCard(params);}
-                case "set_group_leave" -> {responseDTO=mirai.setGroupLeave(params);}
-                case "set_group_special_title" -> {responseDTO=mirai.setGroupSpecialTitle(params);}
-                case "set_discuss_leave" -> {responseDTO=mirai.setDiscussLeave(params);}
-                case "set_friend_add_request" -> {responseDTO=mirai.setFriendAddRequest(params);}
-                case "set_group_add_request" -> {responseDTO=mirai.setGroupAddRequest(params);}
-                case "get_login_info" -> {responseDTO=mirai.getLoginInfo(params);}
-                case "get_stranger_info" -> {responseDTO=mirai.getStrangerInfo(params);}
-                case "get_friend_list" -> {responseDTO=mirai.getFriendList(params);}
-                case "get_group_list" -> {responseDTO=mirai.getGroupList(params);}
-                case "get_group_info" -> {responseDTO=mirai.getGroupInfo(params);}
-                case "get_group_member_info" -> {responseDTO=mirai.getGroupMemberInfo(params);}
-                case "get_group_member_list" -> {responseDTO=mirai.getGroupMemberList(params);}
-                case "get_cookies" -> {responseDTO=mirai.getCookies(params);}
-                case "get_csrf_token" -> {responseDTO=mirai.getCSRFToken(params);}
-                case "get_credentials" -> {responseDTO=mirai.getCredentials(params);}
-                case "get_record" -> {responseDTO=mirai.sendMessage(params);}
-                case "get_image" -> {responseDTO=mirai.sendMessage(params);}
-                case "can_send_image" -> {responseDTO=mirai.canSendImage(params);}
-                case "can_send_record" -> {responseDTO=mirai.canSendRecord(params);}
-                case "get_status" -> {responseDTO=mirai.getStatus(params);}
-                case "get_version_info" -> {responseDTO=mirai.getVersionInfo(params);}
-                case "set_restart_plugin" -> {responseDTO=mirai.setRestartPlugin(params);}
-                case "clean_data_dir" -> {responseDTO=mirai.cleanDataDir(params);}
-                case "clean_plugin_log" -> {responseDTO=mirai.cleanPluginLog(params);}
-                case "set_group_name" -> {responseDTO=mirai.setGroupName(params);}
-                case "get_group_honor_info" -> {responseDTO=mirai.getGroupHonorInfo(params);}
-                case "get_msg" -> {responseDTO=mirai.sendMessage(params);}
-                case "_set_group_announcement" -> {responseDTO=mirai.setGroupAnnouncement(params);}
+                case "send_msg" -> {
+                    responseDTO = mirai.sendMessage(params);
+                }
+                case "send_private_msg" -> {
+                    responseDTO = mirai.sendPrivateMessage(params);
+                }
+                case "send_group_msg" -> {
+                    responseDTO = mirai.sendGroupMessage(params);
+                }
+                case "send_discuss_msg" -> {
+                    responseDTO = mirai.sendDiscussMessage(params);
+                }
+                case "delete_msg" -> {
+                    responseDTO = mirai.deleteMessage(params);
+                }
+                case "send_like" -> {
+                    responseDTO = mirai.sendLike(params);
+                }
+                case "set_group_kick" -> {
+                    responseDTO = mirai.setGroupKick(params);
+                }
+                case "set_group_ban" -> {
+                    responseDTO = mirai.setGroupBan(params);
+                }
+                case "set_group_anonymous_ban" -> {
+                    responseDTO = mirai.setGroupAnonymousBan(params);
+                }
+                case "set_group_whole_ban" -> {
+                    responseDTO = mirai.setWholeGroupBan(params);
+                }
+                case "set_group_admin" -> {
+                    responseDTO = mirai.setGroupAdmin(params);
+                }
+                case "set_group_anonymous" -> {
+                    responseDTO = mirai.setGroupAnonymous(params);
+                }
+                case "set_group_card" -> {
+                    responseDTO = mirai.setGroupCard(params);
+                }
+                case "set_group_leave" -> {
+                    responseDTO = mirai.setGroupLeave(params);
+                }
+                case "set_group_special_title" -> {
+                    responseDTO = mirai.setGroupSpecialTitle(params);
+                }
+                case "set_discuss_leave" -> {
+                    responseDTO = mirai.setDiscussLeave(params);
+                }
+                case "set_friend_add_request" -> {
+                    responseDTO = mirai.setFriendAddRequest(params);
+                }
+                case "set_group_add_request" -> {
+                    responseDTO = mirai.setGroupAddRequest(params);
+                }
+                case "get_login_info" -> {
+                    responseDTO = mirai.getLoginInfo(params);
+                }
+                case "set_qq_profile" -> {
+                    responseDTO = mirai.sendQQProfile(params);
+                }
+                case "get_stranger_info" -> {
+                    responseDTO = mirai.getStrangerInfo(params);
+                }
+                case "get_friend_list" -> {
+                    responseDTO = mirai.getFriendList(params);
+                }
+                case "get_group_list" -> {
+                    responseDTO = mirai.getGroupList(params);
+                }
+                case "get_group_info" -> {
+                    responseDTO = mirai.getGroupInfo(params);
+                }
+                case "get_group_member_info" -> {
+                    responseDTO = mirai.getGroupMemberInfo(params);
+                }
+                case "get_group_member_list" -> {
+                    responseDTO = mirai.getGroupMemberList(params);
+                }
+                case "get_cookies" -> {
+                    responseDTO = mirai.getCookies(params);
+                }
+                case "get_csrf_token" -> {
+                    responseDTO = mirai.getCSRFToken(params);
+                }
+                case "get_credentials" -> {
+                    responseDTO = mirai.getCredentials(params);
+                }
+                case "get_record" -> {
+                    responseDTO = mirai.sendMessage(params);
+                }
+                case "get_image" -> {
+                    responseDTO = mirai.sendMessage(params);
+                }
+                case "can_send_image" -> {
+                    responseDTO = mirai.canSendImage(params);
+                }
+                case "can_send_record" -> {
+                    responseDTO = mirai.canSendRecord(params);
+                }
+                case "get_status" -> {
+                    responseDTO = mirai.getStatus(params);
+                }
+                case "get_version_info" -> {
+                    responseDTO = mirai.getVersionInfo(params);
+                }
+                case "set_restart_plugin" -> {
+                    responseDTO = mirai.setRestartPlugin(params);
+                }
+                case "clean_data_dir" -> {
+                    responseDTO = mirai.cleanDataDir(params);
+                }
+                case "clean_plugin_log" -> {
+                    responseDTO = mirai.cleanPluginLog(params);
+                }
+                case "set_group_name" -> {
+                    responseDTO = mirai.setGroupName(params);
+                }
+                case "get_group_honor_info" -> {
+                    responseDTO = mirai.getGroupHonorInfo(params);
+                }
+                case "get_msg" -> {
+                    responseDTO = mirai.sendMessage(params);
+                }
+                case "_set_group_notice" -> {
+                    responseDTO = mirai.setGroupNotice(params);
+                }
+                case ".get_word_slices" -> {
+                    responseDTO = mirai.getWordSlice(params);
+                }
+                case "set_essence_msg" -> {
+                    responseDTO = mirai.setEssenceMsg(params);
+                }
                 default -> OneBotMirai.logger.error(String.format("未知OneBot API: %s", action));
             }
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             OneBotMirai.logger.info(e);
             responseDTO = new InvalidRequest();
         } catch (PermissionDeniedException e) {
@@ -118,9 +210,9 @@ public class MiraiApi {
 
 
     //send
-    public ActionData<?> sendMessage(JSONObject params){
+    public ActionData<?> sendMessage(JSONObject params) {
         if (params.containsKey("message_type")) {
-            switch (params.getString("message_type")){
+            switch (params.getString("message_type")) {
                 case "private" -> {
                     return sendPrivateMessage(params);
                 }
@@ -140,9 +232,9 @@ public class MiraiApi {
         return new InvalidRequest();
     }
 
-    public ActionData<?> sendGroupMessage(JSONObject params){
+    public ActionData<?> sendGroupMessage(JSONObject params) {
         var targetGroupId = params.getLong("group_id");
-        var raw = params.getBoolean("auto_escape");
+        var raw = params.getBooleanValue("auto_escape", false);
         var messages = params.get("message");
 
         var group = bot.getGroupOrFail(targetGroupId);
@@ -152,24 +244,23 @@ public class MiraiApi {
             var receipt = group.sendMessage(send);
             cachedSourceQueue.add(receipt.getSource());
             return new MessageResponse(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
-        }
-        else {
+        } else {
             return new MessageResponse(-1);
         }
     }
 
-    public ActionData<?> sendPrivateMessage(JSONObject params){
+    public ActionData<?> sendPrivateMessage(JSONObject params) {
         var targetQQId = params.getLong("user_id");
-        var raw = params.getBoolean("auto_escape");
+        var raw = params.getBooleanValue("auto_escape", false);
         var messages = params.get("message");
-        Contact contact ;
+        Contact contact;
 
 
         try {
             contact = bot.getFriendOrFail(targetQQId);
         } catch (NoSuchElementException e) {
             var fromGroupId = cachedTempContact.get(targetQQId);
-                    //?: bot.groups.find { group -> group.members.contains(targetQQId) }?.id
+            //?: bot.groups.find { group -> group.members.contains(targetQQId) }?.id
             contact = bot.getGroupOrFail(fromGroupId).getOrFail(targetQQId);
         }
         var messageChain = OnebotMsgParser.messageToMiraiMessageChains(bot, contact, messages, raw);
@@ -178,35 +269,35 @@ public class MiraiApi {
             var receipt = contact.sendMessage(send);
             cachedSourceQueue.add(receipt.getSource());
             return new MessageResponse(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
-        }
-        else {
+        } else {
             return new MessageResponse(-1);
         }
 
     }
 
     //delete
-    public ActionData<?> deleteMessage(JSONObject params){
+    public ActionData<?> deleteMessage(JSONObject params) {
         var messageId = params.getInteger("message_id");
         MessageSource.recall(cachedSourceQueue.get(messageId));
         return new GeneralSuccess();
     }
 
 
-    public ActionData<?> setGroupKick(JSONObject params){
+    public ActionData<?> setGroupKick(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
-        bot.getGroupOrFail(groupId).getOrFail(memberId).kick("");
+        var rejectAddRequest = params.getBooleanValue("reject_add_request", false);
+        bot.getGroupOrFail(groupId).getOrFail(memberId).kick("", rejectAddRequest);
         return new GeneralSuccess();
     }
 
-    public ActionData<?> sendLike(JSONObject params){
+    public ActionData<?> sendLike(JSONObject params) {
         return new MiraiFailure();
     }
 
 
     //set
-    public ActionData<?> setGroupBan(JSONObject params){
+    public ActionData<?> setGroupBan(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
         var duration = params.getInteger("duration");
@@ -218,7 +309,7 @@ public class MiraiApi {
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupAnonymousBan(JSONObject params){
+    public ActionData<?> setGroupAnonymousBan(JSONObject params) {
         var groupId = params.getLong("group_id");
         String flag = "";
         var flag1 = params.getJSONObject("anonymous").getString("flag");
@@ -226,29 +317,29 @@ public class MiraiApi {
         var flag3 = params.getString("flag");
         if (flag1.isEmpty()) flag = flag2.isEmpty() ? flag3 : flag2;
         var duration = params.getInteger("duration").describeConstable().orElse(30 * 60);
-        var splits = flag.split("&",2);
+        var splits = flag.split("&", 2);
         Mirai.getInstance().muteAnonymousMember(bot, splits[0], splits[1], groupId, duration);
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setWholeGroupBan(JSONObject params){
+    public ActionData<?> setWholeGroupBan(JSONObject params) {
         var groupId = params.getLong("group_id");
-        var enable = params.getBoolean("enable") != null ? params.getBoolean("enable") : true;
+        var enable = params.getBooleanValue("enable", true);
 
         bot.getGroupOrFail(groupId).getSettings().setMuteAll(enable);
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupAdmin(JSONObject params){
+    public ActionData<?> setGroupAdmin(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
-        var enable = params.getBoolean("enable") != null ? params.getBoolean("enable") : true;
+        var enable = params.getBooleanValue("enable", true);
 
         bot.getGroupOrFail(groupId).getOrFail(memberId).modifyAdmin(enable);
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupCard(JSONObject params){
+    public ActionData<?> setGroupCard(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
         var card = params.getString("card").isEmpty() ? "" : params.getString("card");
@@ -257,9 +348,9 @@ public class MiraiApi {
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupLeave(JSONObject params){
+    public ActionData<?> setGroupLeave(JSONObject params) {
         var groupId = params.getLong("group_id");
-        var dismiss = params.getBoolean("is_dismiss") != null ? params.getBoolean("is_dismiss") : false;
+        var dismiss = params.getBooleanValue("is_dismiss", false);
 
         // Not supported
         if (dismiss) return new MiraiFailure();
@@ -268,49 +359,52 @@ public class MiraiApi {
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupSpecialTitle(JSONObject params){
+    public ActionData<?> setGroupSpecialTitle(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
         var specialTitle = params.getString("special_title").isEmpty() ? "" : params.getString("special_title");
-        var duration = params.getInteger("duration").describeConstable().orElse(-1);
+        var duration = params.getIntValue("duration", -1);
 
         bot.getGroupOrFail(groupId).getOrFail(memberId).setSpecialTitle(specialTitle);
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setFriendAddRequest(JSONObject params){
+    public ActionData<?> setFriendAddRequest(JSONObject params) {
         var flag = params.getString("flag");
-        var approve = params.getBoolean("approve") != null ? params.getBoolean("approve") : true;
+        var approve = params.getBooleanValue("approve", true);
         var remark = params.getString("remark");// unused
 
         var event = cacheRequestQueue.get(Long.parseLong(flag));
         if (event instanceof NewFriendRequestEvent requestEvent)
-            if (approve) requestEvent.accept(); else requestEvent.reject(false);
+            if (approve) requestEvent.accept();
+            else requestEvent.reject(false);
         else return new InvalidRequest();
 
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setGroupAddRequest(JSONObject params){
+    public ActionData<?> setGroupAddRequest(JSONObject params) {
         var flag = params.getString("flag");
         var type = params.getString("type"); // unused
         var subType = params.getString("sub_type"); // unused
-        var approve = params.getBoolean("approve") != null ? params.getBoolean("approve") : true;
+        var approve = params.getBooleanValue("approve", true);
         var reason = params.getString("reason");
         var event = cacheRequestQueue.get(Long.parseLong(flag));
         if (event instanceof MemberJoinRequestEvent requestEvent)
-            if (approve) requestEvent.accept(); else requestEvent.reject(true, reason);
+            if (approve) requestEvent.accept();
+            else requestEvent.reject(true, reason);
         else if (event instanceof BotInvitedJoinGroupRequestEvent requestEvent) {
-            if (approve) requestEvent.accept(); else requestEvent.ignore();
+            if (approve) requestEvent.accept();
+            else requestEvent.ignore();
         }
         return new GeneralSuccess();
     }
 
-    public ActionData<?> sendDiscussMessage(JSONObject params){
+    public ActionData<?> sendDiscussMessage(JSONObject params) {
         return new MiraiFailure();
     }
 
-    public ActionData<?> setGroupAnonymous(JSONObject params){
+    public ActionData<?> setGroupAnonymous(JSONObject params) {
         var groupId = params.getLong("group_id");
         var enable = params.getBoolean("enable") != null ? params.getBoolean("enable") : true;
 
@@ -320,13 +414,13 @@ public class MiraiApi {
         return new MiraiFailure();
     }
 
-    public ActionData<?> setDiscussLeave(JSONObject params){
+    public ActionData<?> setDiscussLeave(JSONObject params) {
         return new MiraiFailure();
     }
 
 
     //get
-    public ActionData<?> getLoginInfo(JSONObject params){
+    public ActionData<?> getLoginInfo(JSONObject params) {
         LoginInfoResp loginInfo = new LoginInfoResp(bot.getId(), bot.getNick());
         var data = new ActionData<LoginInfoResp>();
         data.setData(loginInfo);
@@ -335,7 +429,18 @@ public class MiraiApi {
         return data;
     }
 
-    public ActionData<?> getStrangerInfo(JSONObject params){
+    public ActionData<?> sendQQProfile(JSONObject params) {
+        var nick = params.getString("nickname");
+        var company = params.getString("company");
+        var email = params.getString("email");
+        var college = params.getString("college");
+        var personalNote = params.getString("personal_note");
+
+        return new MiraiFailure();
+    }
+
+
+    public ActionData<?> getStrangerInfo(JSONObject params) {
         var userId = params.getLong("user_id");
 
         var profile = Mirai.getInstance().queryProfile(bot, userId);
@@ -352,7 +457,7 @@ public class MiraiApi {
         return data;
     }
 
-    public ActionData<?> getFriendList(JSONObject params){
+    public ActionData<?> getFriendList(JSONObject params) {
         var friendList = new LinkedList<FriendInfoResp>();
         bot.getFriends().forEach(friend -> {
             friendList.add(new FriendInfoResp(friend.getId(), friend.getNick(), friend.getRemark()));
@@ -364,10 +469,11 @@ public class MiraiApi {
         return data;
     }
 
-    public ActionData<?> getGroupList(JSONObject params){
+    public ActionData<?> getGroupList(JSONObject params) {
         var groupList = new LinkedList<GroupDataResp>();
         bot.getGroups().forEach(group ->
-                groupList.add(new GroupDataResp(group.getId(), group.getName()))); {
+                groupList.add(new GroupDataResp(group.getId(), group.getName())));
+        {
         }
         var data = new ActionData<>();
         data.setData(groupList);
@@ -380,9 +486,9 @@ public class MiraiApi {
      * 获取群信息
      * 不支持获取群容量, 返回0
      */
-    public ActionData<?> getGroupInfo(JSONObject params){
+    public ActionData<?> getGroupInfo(JSONObject params) {
         var groupId = params.getLong("group_id");
-        var noCache = params.getBoolean("no_cache") != null ? params.getBoolean("no_cache") : false;// unused
+        var noCache = params.getBooleanValue("no_cache", false);// unused
 
         var group = bot.getGroupOrFail(groupId);
         var groupInfo = new GroupInfoResp();
@@ -400,10 +506,10 @@ public class MiraiApi {
 
     @MiraiExperimentalApi
     @LowLevelApi
-    public ActionData<?> getGroupMemberInfo(JSONObject params){
+    public ActionData<?> getGroupMemberInfo(JSONObject params) {
         var groupId = params.getLong("group_id");
         var memberId = params.getLong("user_id");
-        var noCache = params.getBoolean("no_cache") != null ? params.getBoolean("no_cache") : false;
+        var noCache = params.getBooleanValue("no_cache", false);
 
         var group = bot.getGroupOrFail(groupId);
         var data = new ActionData<GroupMemberInfoResp>();
@@ -412,7 +518,7 @@ public class MiraiApi {
             var members = Mirai.getInstance().getRawGroupMemberList(bot, groupUin, groupId, group.getOwner().getId());
 
             var groupMemberInfo = new GroupMemberInfoResp();
-            var  member = BaseUtils.copyIterator(members.iterator())
+            var member = BaseUtils.copyIterator(members.iterator())
                     .stream()
                     .filter(memberInfo -> memberInfo.getUin() == memberId)
                     .findFirst();
@@ -424,7 +530,8 @@ public class MiraiApi {
                     groupMemberInfo.setCard(memberInfo.getNameCard());
                     groupMemberInfo.setJoinTime(member.get().getJoinTimestamp());
                     groupMemberInfo.setLastSentTime(member.get().getLastSpeakTimestamp());
-                    if (member.get().getPermission() == MemberPermission.ADMINISTRATOR) groupMemberInfo.setRole("admin");
+                    if (member.get().getPermission() == MemberPermission.ADMINISTRATOR)
+                        groupMemberInfo.setRole("admin");
                     else groupMemberInfo.setRole(member.get().getPermission().name().toLowerCase());
                     groupMemberInfo.setTitle(memberInfo.getSpecialTitle());
                     groupMemberInfo.setCardChangeable(group.getBotPermission() == MemberPermission.OWNER);
@@ -434,8 +541,7 @@ public class MiraiApi {
                 data.setStatus("ok");
                 data.setRetCode(0);
                 return data;
-            }
-            else {
+            } else {
                 return new MiraiFailure();
             }
 
@@ -449,7 +555,7 @@ public class MiraiApi {
         }
     }
 
-    public ActionData<?> getGroupMemberList(JSONObject params){
+    public ActionData<?> getGroupMemberList(JSONObject params) {
         var groupId = params.getLong("group_id");
         var groupMemberListData = new LinkedList<GroupMemberInfoResp>();
         var data = new ActionData<>();
@@ -520,7 +626,7 @@ public class MiraiApi {
 //        } ?: return ResponseDTO.PluginFailure()
 //    }
 
-    public ActionData<?> canSendImage(JSONObject params){
+    public ActionData<?> canSendImage(JSONObject params) {
         var data = new ActionData<BooleanResp>();
         data.setData(new BooleanResp(true));
         data.setStatus("ok");
@@ -528,7 +634,7 @@ public class MiraiApi {
         return data;
     }
 
-    public ActionData<?> canSendRecord(JSONObject params){
+    public ActionData<?> canSendRecord(JSONObject params) {
         var data = new ActionData<BooleanResp>();
         data.setData(new BooleanResp(true));
         data.setStatus("ok");
@@ -536,7 +642,7 @@ public class MiraiApi {
         return data;
     }
 
-    public ActionData<?> getStatus(JSONObject params){
+    public ActionData<?> getStatus(JSONObject params) {
         var data = new ActionData<PluginStatusResp>();
         data.setStatus("ok");
         data.setRetCode(0);
@@ -545,9 +651,7 @@ public class MiraiApi {
     }
 
 
-
-
-    public ActionData<?> getVersionInfo(JSONObject params){
+    public ActionData<?> getVersionInfo(JSONObject params) {
         var data = new ActionData<VersionInfo>();
         data.setData(new VersionInfo());
         data.setStatus("ok");
@@ -559,12 +663,12 @@ public class MiraiApi {
     ////  v11  ////
     //////////////
 
-    public ActionData<?> setGroupName(JSONObject params){
+    public ActionData<?> setGroupName(JSONObject params) {
         var groupId = params.getLong("group_id");
         var name = params.getString("group_name");
         if (!"".equals(name)) {
             bot.getGroupOrFail(groupId).setName(name);
-            return new  GeneralSuccess();
+            return new GeneralSuccess();
         } else {
             return new InvalidRequest();
         }
@@ -572,7 +676,7 @@ public class MiraiApi {
 
     @MiraiExperimentalApi
     @LowLevelApi
-    public ActionData<?> getGroupHonorInfo(JSONObject params){
+    public ActionData<?> getGroupHonorInfo(JSONObject params) {
         var groupId = params.getLong("group_id");
         var type = params.getString("type");
 
@@ -585,48 +689,66 @@ public class MiraiApi {
         return finalData != null ? data : new MiraiFailure();
     }
 
-    /////////////////
-    //// hidden ////
-    ///////////////
 
-    @MiraiExperimentalApi
-    @LowLevelApi
-    public ActionData<?>setGroupAnnouncement(JSONObject params){
+    public ActionData<?> setGroupNotice(JSONObject params) {
         var groupId = params.getLong("group_id");
         var content = params.getString("content");
         if (!"".equals(content)) {
             bot.getGroupOrFail(groupId).getAnnouncements().publish(OfflineAnnouncement.create(content));
-            return new  GeneralSuccess();
+            return new GeneralSuccess();
         } else {
             return new InvalidRequest();
         }
+    }
+
+    public ActionData<?> setEssenceMsg(JSONObject params) {
+        var groupId = params.getLong("group_id");
+        var messageId = params.getInteger("message_id");
+        //bot.getGroupOrFail(groupId).setEssenceMessage()
+        return new GeneralSuccess();
+
+    }
+
+    /////////////////
+    //// hidden ////
+    ///////////////
+
+
+
+    @MiraiExperimentalApi
+    @LowLevelApi
+    public ActionData<?> getWordSlice(JSONObject params) {
+        var content = params.getString("content");
+
+        return new GeneralSuccess();
+
     }
 
     //todo
     ////////////////////////////////
     //// currently unsupported ////
     //////////////////////////////
-    public ActionData<?> getCookies(JSONObject params){
+    public ActionData<?> getCookies(JSONObject params) {
         return new MiraiFailure();
     }
 
-    public ActionData<?> getCSRFToken(JSONObject params){
+    public ActionData<?> getCSRFToken(JSONObject params) {
         return new MiraiFailure();
     }
 
-    public ActionData<?> getCredentials(JSONObject params){
+    public ActionData<?> getCredentials(JSONObject params) {
         return new MiraiFailure();
     }
 
-    public ActionData<?> cleanDataDir(JSONObject params){
+    public ActionData<?> cleanDataDir(JSONObject params) {
         return new GeneralSuccess();
     }
 
-    public ActionData<?> cleanPluginLog(JSONObject params){
+    public ActionData<?> cleanPluginLog(JSONObject params) {
         return new GeneralSuccess();
     }
 
-    public ActionData<?> setRestartPlugin(JSONObject params){
+    public ActionData<?> setRestartPlugin(JSONObject params) {
         var delay = params.getInteger("delay");// unused
         return new GeneralSuccess();
     }
