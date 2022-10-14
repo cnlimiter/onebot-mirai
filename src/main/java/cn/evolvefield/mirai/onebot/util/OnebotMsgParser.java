@@ -2,16 +2,15 @@ package cn.evolvefield.mirai.onebot.util;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import com.alibaba.fastjson2.JSONObject;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.event.events.MessageEvent;
 import net.mamoe.mirai.message.data.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Description:
