@@ -7,6 +7,7 @@ import cn.evolvefield.mirai.onebot.dto.response.msic.AsyncStarted;
 import cn.evolvefield.mirai.onebot.web.websocket.core.WebSocketSession;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import org.java_websocket.WebSocket;
 
 /**
  * Description:
@@ -15,25 +16,19 @@ import com.alibaba.fastjson2.JSONObject;
  * Version: 1.0
  */
 public class ActionUtils {
-    public static void handleWebSocketActions(WebSocketSession session, MiraiApi api, String text){
+    public static void handleWebSocketActions(WebSocket session, MiraiApi api, String text){
         try {
-            OneBotMirai.logger.debug(String.format("WebSocket收到操作请求: %s", text));
-            var json = JSONObject.parseObject(text);
+            OneBotMirai.logger.info(String.format("WebSocket收到操作请求: %s", text));
+            var json = JSON.parseObject(text);
             var echo = json.getString("echo");
-            var action = json.getJSONObject("action").toString();
-            ActionData<?> responseDTO;
-            if (action.endsWith("_async")) {
-                responseDTO = new AsyncStarted();
-                action = action.replace("_async", "");
-                api.callMiraiApi(action, json.getJSONObject("params"), api);
+            var action = json.getString("action");
 
-            } else {
-                responseDTO = api.callMiraiApi(action, json.getJSONObject("params"), api);
-            }
+            var responseDTO = api.callMiraiApi(action, json.getJSONObject("params"), api);
+
             responseDTO.setEcho(echo);
             var jsonToSend = JSON.toJSONString(responseDTO);
             OneBotMirai.logger.debug(String.format("WebSocket将返回结果: %s" ,jsonToSend));
-            session.getChannel().writeAndFlush(jsonToSend);
+            session.send(jsonToSend);
         } catch (Exception e) {
             OneBotMirai.logger.error(e);
         }
