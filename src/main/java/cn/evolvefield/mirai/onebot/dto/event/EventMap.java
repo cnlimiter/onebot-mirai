@@ -86,6 +86,8 @@ public class EventMap {
         }
         else if (botEvent instanceof BotJoinGroupEvent.Active active){
             var event = new GroupIncreaseNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("group_increase");
             event.setSelfId(active.getBot().getId());
             event.setSubType("approve");
             event.setGroupId(active.getGroupId());
@@ -107,12 +109,12 @@ public class EventMap {
             return event;
         }
         else if (botEvent instanceof BotLeaveEvent leaveEvent){
+            var event = new GroupDecreaseNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("group_decrease");
+            event.setSubType("kick_me");
             if (leaveEvent instanceof BotLeaveEvent.Active active){
-                var event = new GroupDecreaseNoticeEvent();
-                event.setPostType("notice");
-                event.setNoticeType("group_decrease");
                 event.setSelfId(active.getBot().getId());
-                event.setSubType("kick_me");
                 event.setGroupId(active.getGroupId());
                 event.setOperatorId(0);
                 event.setUserId(active.getBot().getId());
@@ -120,11 +122,7 @@ public class EventMap {
                 return event;
             }
             else if (leaveEvent instanceof BotLeaveEvent.Kick kick){
-                var event = new GroupDecreaseNoticeEvent();
-                event.setPostType("notice");
-                event.setNoticeType("group_decrease");
                 event.setSelfId(kick.getBot().getId());
-                event.setSubType("kick_me");
                 event.setGroupId(kick.getGroupId());
                 event.setOperatorId(0);
                 event.setUserId(kick.getBot().getId());
@@ -134,10 +132,10 @@ public class EventMap {
             else return new IgnoreEvent();
         }
         else if (botEvent instanceof MemberPermissionChangeEvent changeEvent){
+            var event = new GroupAdminNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("group_admin");
             if (changeEvent.getNew().compareTo(MemberPermission.MEMBER) == 0){
-                var event = new GroupAdminNoticeEvent();
-                event.setPostType("notice");
-                event.setNoticeType("group_admin");
                 event.setSelfId(changeEvent.getBot().getId());
                 event.setSubType("unset");
                 event.setGroupId(changeEvent.getGroupId());
@@ -146,9 +144,6 @@ public class EventMap {
                 return event;
             }
             else {
-                var event = new GroupAdminNoticeEvent();
-                event.setPostType("notice");
-                event.setNoticeType("group_admin");
                 event.setSelfId(changeEvent.getBot().getId());
                 event.setSubType("set");
                 event.setGroupId(changeEvent.getGroupId());
@@ -308,6 +303,7 @@ public class EventMap {
             if (recallEvent instanceof MessageRecallEvent.GroupRecall groupRecall){
                 var event = new GroupMsgDeleteNoticeEvent();
                 event.setPostType("notice");
+                event.setNoticeType("group_recall");
                 event.setSelfId(groupRecall.getBot().getId());
                 event.setGroupId(groupRecall.getGroup().getId());
                 event.setUserId(groupRecall.getAuthorId());
@@ -319,6 +315,8 @@ public class EventMap {
             }
             else if (recallEvent instanceof MessageRecallEvent.FriendRecall friendRecall){
                 var event = new GroupMsgDeleteNoticeEvent();
+                event.setPostType("notice");
+                event.setNoticeType("friend_recall");
                 event.setSelfId(friendRecall.getBot().getId());
                 event.setUserId(friendRecall.getOperatorId());
                 event.setMsgId(DataBaseUtils.toMessageId(friendRecall.getMessageIds(), friendRecall.getBot().getId(),
@@ -333,10 +331,25 @@ public class EventMap {
         }
         else if (botEvent instanceof MemberHonorChangeEvent changeEvent){
             var event = new GroupHonorChangeNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("notify");
+            event.setSubType("honor");
             event.setSelfId(changeEvent.getBot().getId());
             event.setGroupId(changeEvent.getGroup().getId());
             event.setUserId(changeEvent.getUser().getId());
             event.setHonorType(changeEvent.getHonorType().name().toLowerCase());
+            event.setTime(currentTimeSeconds);
+            return event;
+        }
+        else if (botEvent instanceof MemberCardChangeEvent changeEvent){
+            var event = new GroupCardChangeNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("group_card");
+            event.setSelfId(changeEvent.getBot().getId());
+            event.setGroupId(changeEvent.getGroup().getId());
+            event.setUserId(changeEvent.getUser().getId());
+            event.setCardNew(changeEvent.getNew());
+            event.setCardOld(changeEvent.getOrigin());
             event.setTime(currentTimeSeconds);
             return event;
         }
