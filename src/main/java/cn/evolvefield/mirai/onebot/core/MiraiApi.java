@@ -11,7 +11,7 @@ import cn.evolvefield.mirai.onebot.dto.response.group.GroupDataResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupHonorInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupMemberInfoResp;
-import cn.evolvefield.mirai.onebot.dto.response.msic.*;
+import cn.evolvefield.mirai.onebot.dto.response.misc.*;
 import cn.evolvefield.mirai.onebot.util.BaseUtils;
 import cn.evolvefield.mirai.onebot.util.DataBaseUtils;
 import cn.evolvefield.mirai.onebot.util.OnebotMsgParser;

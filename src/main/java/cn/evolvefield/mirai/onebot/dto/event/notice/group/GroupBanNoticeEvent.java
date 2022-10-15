@@ -1,5 +1,6 @@
-package cn.evolvefield.mirai.onebot.dto.event.notice;
+package cn.evolvefield.mirai.onebot.dto.event.notice.group;
 
+import cn.evolvefield.mirai.onebot.dto.event.notice.NoticeEvent;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
-public class GroupMsgDeleteNoticeEvent extends NoticeEvent {
+public class GroupBanNoticeEvent extends NoticeEvent {
+
+    @JSONField(name = "sub_type")
+    private String subType;
 
     @JSONField(name = "group_id")
     private long groupId;
@@ -25,7 +29,10 @@ public class GroupMsgDeleteNoticeEvent extends NoticeEvent {
     @JSONField(name = "operator_id")
     private long operatorId;
 
-    @JSONField(name = "message_id")
-    private long msgId;
+    @JSONField(name = "duration")
+    private long duration;
+
+    @JSONField(name = "user_id")
+    private long userId;
 
 }

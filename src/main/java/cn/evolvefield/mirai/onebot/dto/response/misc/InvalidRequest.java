@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.dto.response.msic;
+package cn.evolvefield.mirai.onebot.dto.response.misc;
 
 import cn.evolvefield.mirai.onebot.dto.response.ActionData;
 

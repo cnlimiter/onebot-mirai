@@ -1,11 +1,11 @@
-package cn.evolvefield.mirai.onebot.dto.event.notice;
+package cn.evolvefield.mirai.onebot.dto.event.notice.friend;
 
+import cn.evolvefield.mirai.onebot.dto.event.notice.NoticeEvent;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Created on 2022/7/8.
@@ -15,20 +15,18 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
-public class GroupHonorChangeNoticeEvent extends NoticeEvent {
+public class PrivatePokeNoticeEvent extends NoticeEvent {
 
     @JSONField(name = "sub_type")
     private String subType;
 
-    @JSONField(name = "group_id")
-    private long groupId;
+    @JSONField(name = "sender_id")
+    private long senderId;
 
-    @JSONField(name = "honor_type")
-    private String honorType;
+    @JSONField(name = "target_id")
+    private long targetId;
 
-    @JSONField(name = "user_id")
-    private long userId;
+
 
 }

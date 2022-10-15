@@ -2,7 +2,10 @@ package cn.evolvefield.mirai.onebot.dto.event;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.dto.event.message.MessageMap;
-import cn.evolvefield.mirai.onebot.dto.event.notice.*;
+import cn.evolvefield.mirai.onebot.dto.event.notice.friend.FriendAddNoticeEvent;
+import cn.evolvefield.mirai.onebot.dto.event.notice.friend.PrivatePokeNoticeEvent;
+import cn.evolvefield.mirai.onebot.dto.event.notice.group.*;
+import cn.evolvefield.mirai.onebot.dto.event.notice.misc.OtherClientStatusNoticeEvent;
 import cn.evolvefield.mirai.onebot.dto.event.request.FriendAddRequestEvent;
 import cn.evolvefield.mirai.onebot.dto.event.request.GroupAddRequestEvent;
 import cn.evolvefield.mirai.onebot.util.DataBaseUtils;
@@ -352,6 +355,36 @@ public class EventMap {
             event.setCardOld(changeEvent.getOrigin());
             event.setTime(currentTimeSeconds);
             return event;
+        }
+        else if (botEvent instanceof MemberSpecialTitleChangeEvent changeEvent){
+            var event = new GroupTitleChangeNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("group_title");
+            event.setSelfId(changeEvent.getBot().getId());
+            event.setGroupId(changeEvent.getGroup().getId());
+            event.setUserId(changeEvent.getUser().getId());
+            event.setTitleNew(changeEvent.getNew());
+            event.setTitleOld(changeEvent.getOrigin());
+            event.setTime(currentTimeSeconds);
+            return event;
+        }
+        else if (botEvent instanceof OtherClientEvent clientEvent){
+            var event = new OtherClientStatusNoticeEvent();
+            event.setPostType("notice");
+            event.setNoticeType("client_status");
+            if (clientEvent instanceof OtherClientOfflineEvent offlineEvent){
+                event.setSelfId(offlineEvent.getBot().getId());
+                event.setClient(new OtherClientStatusNoticeEvent.Clients(offlineEvent.getClient().getInfo()));
+                event.setOnline(false);
+                return event;
+            }
+            else if (clientEvent instanceof OtherClientOnlineEvent onlineEvent){
+                event.setSelfId(onlineEvent.getBot().getId());
+                event.setClient(new OtherClientStatusNoticeEvent.Clients(onlineEvent.getClient().getInfo()));
+                event.setOnline(false);
+                return event;
+            }
+            else return new IgnoreEvent();
         }
         else {
             logger.info(String.format("发生了被插件忽略的事件: %s", botEvent));

@@ -1,5 +1,6 @@
-package cn.evolvefield.mirai.onebot.dto.event.notice;
+package cn.evolvefield.mirai.onebot.dto.event.notice.group;
 
+import cn.evolvefield.mirai.onebot.dto.event.notice.NoticeEvent;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
-public class GroupEssenceNoticeEvent extends NoticeEvent{
+public class GroupEssenceNoticeEvent extends NoticeEvent {
     @JSONField(name = "sub_type")
     private String  subType;//add,delete	添加为add,移出为delete
     @JSONField(name = "sender_id")

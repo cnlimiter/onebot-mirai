@@ -1,5 +1,6 @@
-package cn.evolvefield.mirai.onebot.dto.event.notice;
+package cn.evolvefield.mirai.onebot.dto.event.notice.group;
 
+import cn.evolvefield.mirai.onebot.dto.event.notice.NoticeEvent;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
-public class GroupBanNoticeEvent extends NoticeEvent {
+public class GroupDecreaseNoticeEvent extends NoticeEvent {
 
     @JSONField(name = "sub_type")
     private String subType;
@@ -27,9 +28,6 @@ public class GroupBanNoticeEvent extends NoticeEvent {
 
     @JSONField(name = "operator_id")
     private long operatorId;
-
-    @JSONField(name = "duration")
-    private long duration;
 
     @JSONField(name = "user_id")
     private long userId;
