@@ -2,8 +2,9 @@ package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.dto.response.ActionData;
-import cn.evolvefield.mirai.onebot.dto.response.BooleanResp;
-import cn.evolvefield.mirai.onebot.dto.response.MessageResponse;
+import cn.evolvefield.mirai.onebot.dto.response.common.*;
+import cn.evolvefield.mirai.onebot.dto.response.misc.BooleanResp;
+import cn.evolvefield.mirai.onebot.dto.response.common.MessageResponse;
 import cn.evolvefield.mirai.onebot.dto.response.contact.FriendInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.contact.LoginInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.contact.StrangerInfoResp;
@@ -11,13 +12,13 @@ import cn.evolvefield.mirai.onebot.dto.response.group.GroupDataResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupHonorInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupInfoResp;
 import cn.evolvefield.mirai.onebot.dto.response.group.GroupMemberInfoResp;
-import cn.evolvefield.mirai.onebot.dto.response.misc.*;
 import cn.evolvefield.mirai.onebot.util.BaseUtils;
 import cn.evolvefield.mirai.onebot.util.DataBaseUtils;
 import cn.evolvefield.mirai.onebot.util.OnebotMsgParser;
 import cn.evolvefield.mirai.onebot.web.queue.CacheRequestQueue;
 import cn.evolvefield.mirai.onebot.web.queue.CacheSourceQueue;
 import com.alibaba.fastjson2.JSONObject;
+import kotlinx.coroutines.flow.Flow;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.LowLevelApi;
@@ -26,6 +27,8 @@ import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.MemberPermission;
 import net.mamoe.mirai.contact.PermissionDeniedException;
 import net.mamoe.mirai.contact.announcement.OfflineAnnouncement;
+import net.mamoe.mirai.contact.file.AbsoluteFileFolder;
+import net.mamoe.mirai.contact.file.AbsoluteFolder;
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent;
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent;
 import net.mamoe.mirai.event.events.NewFriendRequestEvent;
@@ -43,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Date: 2022/10/4 1:41
  * Version: 1.0
  */
-public class MiraiApi {
+public class ApiMap {
     Bot bot;
     @Getter
     private final LinkedHashMap<Long, Long> cachedTempContact = new LinkedHashMap<>();
@@ -52,11 +55,11 @@ public class MiraiApi {
     @Getter
     private final CacheSourceQueue cachedSourceQueue = new CacheSourceQueue();
 
-    public MiraiApi(Bot bot) {
+    public ApiMap(Bot bot) {
         this.bot = bot;
     }
 
-    public ActionData<?> callMiraiApi(String action, JSONObject params, MiraiApi mirai) {
+    public ActionData<?> callMiraiApi(String action, JSONObject params, ApiMap mirai) {
         ActionData<?> responseDTO = new PluginFailure();
 
         try {
@@ -193,6 +196,9 @@ public class MiraiApi {
                 case "set_essence_msg" -> {
                     responseDTO = mirai.setEssenceMsg(params);
                 }
+                case "get_group_root_files" -> {
+                    responseDTO = mirai.setEssenceMsg(params);
+                }
                 default -> OneBotMirai.logger.error(String.format("未知OneBot API: %s", action));
             }
         } catch (IllegalArgumentException e) {
@@ -207,9 +213,10 @@ public class MiraiApi {
         }
         return responseDTO;
     }
+    ////////////////
+    ////  v11  ////
+    //////////////
 
-
-    //send
     public ActionData<?> sendMessage(JSONObject params) {
         if (params.containsKey("message_type")) {
             switch (params.getString("message_type")) {
@@ -659,10 +666,6 @@ public class MiraiApi {
         return data;
     }
 
-    ////////////////
-    ////  v11  ////
-    //////////////
-
     public ActionData<?> setGroupName(JSONObject params) {
         var groupId = params.getLong("group_id");
         var name = params.getString("group_name");
@@ -700,38 +703,6 @@ public class MiraiApi {
             return new InvalidRequest();
         }
     }
-
-    public ActionData<?> setEssenceMsg(JSONObject params) {
-        var groupId = params.getLong("group_id");
-        var messageId = params.getInteger("message_id");
-        bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();
-
-    }
-
-    public ActionData<?> deleteEssenceMsg(JSONObject params) {
-        var groupId = params.getLong("group_id");
-        var messageId = params.getInteger("message_id");
-        bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();//todo 等待mirai的api
-
-    }
-
-    /////////////////
-    //// hidden ////
-    ///////////////
-
-
-
-    @MiraiExperimentalApi
-    @LowLevelApi
-    public ActionData<?> getWordSlice(JSONObject params) {
-        var content = params.getString("content");
-
-        return new GeneralSuccess();
-
-    }
-
     //todo
     ////////////////////////////////
     //// currently unsupported ////
@@ -760,6 +731,50 @@ public class MiraiApi {
         var delay = params.getInteger("delay");// unused
         return new GeneralSuccess();
     }
+
+
+    /////////////////
+    //// hidden ////
+    ///////////////
+    @MiraiExperimentalApi
+    @LowLevelApi
+    public ActionData<?> getWordSlice(JSONObject params) {
+        var content = params.getString("content");
+
+        return new GeneralSuccess();
+
+    }
+
+    /////////////////
+    ////addition ///
+    ///////////////
+    public ActionData<?> getGroupRootFiles(JSONObject params) {
+        var groupId = params.getLong("group_id");
+
+        //Mirai.getInstance().getFileCacheStrategy()
+        //bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
+        return new GeneralSuccess();
+
+    }
+
+    public ActionData<?> setEssenceMsg(JSONObject params) {
+        var groupId = params.getLong("group_id");
+        var messageId = params.getInteger("message_id");
+        bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
+        return new GeneralSuccess();
+
+    }
+
+    public ActionData<?> deleteEssenceMsg(JSONObject params) {
+        var groupId = params.getLong("group_id");
+        var messageId = params.getInteger("message_id");
+        //bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
+        return new GeneralSuccess();//todo 等待mirai的api
+
+    }
+
+
+
 
 
 }

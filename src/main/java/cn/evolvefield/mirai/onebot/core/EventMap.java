@@ -1,7 +1,8 @@
-package cn.evolvefield.mirai.onebot.dto.event;
+package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
-import cn.evolvefield.mirai.onebot.dto.event.message.MessageMap;
+import cn.evolvefield.mirai.onebot.dto.event.Event;
+import cn.evolvefield.mirai.onebot.dto.event.IgnoreEvent;
 import cn.evolvefield.mirai.onebot.dto.event.notice.friend.FriendAddNoticeEvent;
 import cn.evolvefield.mirai.onebot.dto.event.notice.friend.PrivatePokeNoticeEvent;
 import cn.evolvefield.mirai.onebot.dto.event.notice.group.*;

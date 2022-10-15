@@ -1,7 +1,7 @@
 package cn.evolvefield.mirai.onebot.util;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
-import cn.evolvefield.mirai.onebot.core.MiraiApi;
+import cn.evolvefield.mirai.onebot.core.ApiMap;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.java_websocket.WebSocket;
@@ -13,7 +13,7 @@ import org.java_websocket.WebSocket;
  * Version: 1.0
  */
 public class ActionUtils {
-    public static void handleWebSocketActions(WebSocket session, MiraiApi api, JSONObject json){
+    public static void handleWebSocketActions(WebSocket session, ApiMap api, JSONObject json){
         try {
             OneBotMirai.logger.info(String.format("WebSocket收到操作请求: %s", JSON.toJSONString(json)));
             var echo = json.getString("echo");

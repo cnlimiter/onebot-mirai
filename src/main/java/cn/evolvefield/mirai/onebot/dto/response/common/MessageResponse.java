@@ -1,5 +1,6 @@
-package cn.evolvefield.mirai.onebot.dto.response;
+package cn.evolvefield.mirai.onebot.dto.response.common;
 
+import cn.evolvefield.mirai.onebot.dto.response.ActionData;
 import cn.evolvefield.mirai.onebot.entity.MsgId;
 
 /**
@@ -8,7 +9,7 @@ import cn.evolvefield.mirai.onebot.entity.MsgId;
  * Date: 2022/10/10 0:04
  * Version: 1.0
  */
-public class MessageResponse extends ActionData<MsgId>{
+public class MessageResponse extends ActionData<MsgId> {
     public MessageResponse(int messageId){
         this.setStatus("ok");
         this.setRetCode(0);

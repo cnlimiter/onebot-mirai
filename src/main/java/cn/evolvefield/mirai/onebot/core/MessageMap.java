@@ -1,7 +1,8 @@
-package cn.evolvefield.mirai.onebot.dto.event.message;
+package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.dto.event.Event;
 import cn.evolvefield.mirai.onebot.dto.event.IgnoreEvent;
+import cn.evolvefield.mirai.onebot.dto.event.message.PrivateMessageEvent;
 import cn.evolvefield.mirai.onebot.entity.Anonymous;
 import cn.evolvefield.mirai.onebot.util.DataBaseUtils;
 import cn.evolvefield.mirai.onebot.util.OnebotMsgParser;

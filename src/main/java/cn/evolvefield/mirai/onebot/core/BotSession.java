@@ -2,7 +2,6 @@ package cn.evolvefield.mirai.onebot.core;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.config.BotConfig;
-import cn.evolvefield.mirai.onebot.dto.event.EventMap;
 import cn.evolvefield.mirai.onebot.dto.event.IgnoreEvent;
 import cn.evolvefield.mirai.onebot.web.websocket.OneBotWSServer;
 import com.alibaba.fastjson2.JSON;
@@ -26,12 +25,12 @@ public class BotSession {
     private final OneBotWSServer websocketServer;
 
     @Getter
-    private final MiraiApi apiImpl;
+    private final ApiMap apiImpl;
 
     public BotSession(Bot bot, BotConfig botConfig){
         this.bot = bot;
         this.botConfig = botConfig;
-        this.apiImpl = new MiraiApi(bot);
+        this.apiImpl = new ApiMap(bot);
         this.websocketServer = new OneBotWSServer(this);
         this.websocketServer.create();
     }
