@@ -1,6 +1,6 @@
 id: cn.evolvefield.mirai.onebot
 main: cn.evolvefield.mirai.onebot.OneBotMirai
-version: 0.1.3
+version: 0.1.5
 name: OneBot_Mirai
 author: cnlimiter
 dependencies: [ ]

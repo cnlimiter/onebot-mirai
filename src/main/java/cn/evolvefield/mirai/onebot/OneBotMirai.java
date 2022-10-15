@@ -22,7 +22,7 @@ public final class OneBotMirai extends JavaPlugin {
     private Listener<? extends Event> initialSubscription = null;
 
     private OneBotMirai() {
-        super(new JvmPluginDescriptionBuilder("cn.evolvefield.mirai.onebot", "0.1.3")
+        super(new JvmPluginDescriptionBuilder("cn.evolvefield.mirai.onebot", "0.1.5")
                 .name("OneBot Mirai")
                 .author("cnlimiter")
                 .build());
