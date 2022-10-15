@@ -2,12 +2,20 @@ package cn.evolvefield.mirai.onebot.web.websocket;
 
 import cn.evolvefield.mirai.onebot.OneBotMirai;
 import cn.evolvefield.mirai.onebot.core.BotSession;
+import cn.evolvefield.mirai.onebot.dto.event.meta.HeartbeatMetaEvent;
+import cn.evolvefield.mirai.onebot.dto.response.ActionData;
 import cn.evolvefield.mirai.onebot.util.ActionUtils;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import lombok.Getter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Description:正向websocket服务器
@@ -38,17 +46,17 @@ public class OneBotWSServer extends WebSocketServer{
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        var listener = botSession.subscribeEvent(conn);//发送数据
+        var json = JSONObject.parseObject(message);
 
-        try {
+        if (json.containsKey("action")){
             OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
-
-            ActionUtils.handleWebSocketActions(conn, botSession.getApiImpl(), message);
-
-        } finally {
-            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
-            botSession.unsubscribeEvent(listener);//错误处理
+            ActionUtils.handleWebSocketActions(conn, botSession.getApiImpl(), json);
         }
+
+
+
+
+
     }
 
     @Override
@@ -73,4 +81,24 @@ public class OneBotWSServer extends WebSocketServer{
             OneBotMirai.logger.error(String.format("出现错误:\n %s", e));
         }
     }
+
+
+
+    /**
+     * 心跳保活
+     * @param var1
+     */
+    private void heartbeat(WebSocket var1){
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        Runnable runnable = () -> {
+            if(var1 != null) {
+                var data = new ActionData<>();
+                var event = new HeartbeatMetaEvent();
+                data.setData(event);
+                var1.send(JSON.toJSONString(data));
+            }
+        };
+        service.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+    }
+
 }

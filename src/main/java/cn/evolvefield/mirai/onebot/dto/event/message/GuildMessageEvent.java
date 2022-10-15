@@ -54,4 +54,9 @@ public class GuildMessageEvent extends MessageEvent {
 
     }
 
+
+    @Override
+    public void setMessageType(String messageType) {
+        super.setMessageType("guild");
+    }
 }

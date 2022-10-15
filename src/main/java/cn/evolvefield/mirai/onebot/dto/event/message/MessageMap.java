@@ -31,6 +31,8 @@ public class MessageMap {
 
         if (botEvent instanceof GroupMessageEvent group){
             var event = new cn.evolvefield.mirai.onebot.dto.event.message.GroupMessageEvent();
+            event.setPostType("message");
+            event.setMessageType("group");
             event.setSelfId(group.getBot().getId());
             if (group.getSender() instanceof AnonymousMember) event.setSubType("anonymous");
             else event.setSubType("normal");
@@ -44,7 +46,7 @@ public class MessageMap {
                 anonymous1.setName(anonymous.getNameCard());
                 event.setAnonymous(anonymous1);;
             }
-            else event.setAnonymous(new Anonymous());
+            else event.setAnonymous(null);
             event.setMessage(rawMessage[0]);
             event.setRawMessage(rawMessage[0]);
             event.setFont(0);
@@ -54,6 +56,8 @@ public class MessageMap {
         }
         else if (botEvent instanceof FriendMessageEvent friend){
             var event = new PrivateMessageEvent();
+            event.setPostType("message");
+            event.setMessageType("private");
             event.setSelfId(friend.getBot().getId());
             event.setSubType("friend");
             event.setMessageId(DataBaseUtils.toMessageId(friend.getSource().getInternalIds(), friend.getBot().getId(), friend.getSource().getFromId()));
@@ -67,6 +71,8 @@ public class MessageMap {
         }
         else if (botEvent instanceof GroupTempMessageEvent temp){
             var event = new PrivateMessageEvent();
+            event.setPostType("message");
+            event.setMessageType("private");
             event.setSelfId(temp.getBot().getId());
             event.setSubType("group");
             event.setMessageId(DataBaseUtils.toMessageId(temp.getSource().getInternalIds(), temp.getBot().getId(), temp.getSource().getFromId()));

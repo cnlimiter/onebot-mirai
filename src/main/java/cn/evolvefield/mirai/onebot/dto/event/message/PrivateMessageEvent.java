@@ -62,4 +62,8 @@ public class PrivateMessageEvent extends MessageEvent {
 
     }
 
+    @Override
+    public void setMessageType(String messageType) {
+        super.setMessageType("private");
+    }
 }

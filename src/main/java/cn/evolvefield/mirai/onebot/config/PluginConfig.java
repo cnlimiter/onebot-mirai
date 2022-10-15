@@ -22,8 +22,8 @@ public class PluginConfig extends JavaAutoSavePluginConfig {
 
     }
 
-    public final Value<Map<String, HashMap<String, BotConfig>>> bots = typedValue("bots",
-            createKType(Map.class, createKType(String.class), createKType(HashMap.class)),
+    public final Value<Map<String, Map<String, BotConfig>>> bots = typedValue("bots",
+            createKType(Map.class, createKType(String.class), createKType(Map.class, createKType(String.class), createKType(BotConfig.class))),
             new HashMap<>() {{
                 put("123454321", new HashMap<>() {{
                     put("ws", new BotConfig());

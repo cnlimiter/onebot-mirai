@@ -9,9 +9,6 @@ import com.alibaba.fastjson2.JSON;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.events.BotEvent;
-import org.java_websocket.WebSocket;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Description:功能实现单元
@@ -26,9 +23,6 @@ public class BotSession {
     @Getter
     private final BotConfig botConfig;
 
-    @Getter
-    private final ConcurrentLinkedQueue<String> eventSubscriptionString = new ConcurrentLinkedQueue<>();
-
     private final OneBotWSServer websocketServer;
 
     @Getter
@@ -39,7 +33,7 @@ public class BotSession {
         this.botConfig = botConfig;
         this.apiImpl = new MiraiApi(bot);
         this.websocketServer = new OneBotWSServer(this);
-        websocketServer.create();
+        this.websocketServer.create();
     }
 
     public void close()  {
@@ -49,23 +43,9 @@ public class BotSession {
     public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event, true);
         var json = JSON.toJSONString(e);
-        OneBotMirai.logger.info(String.format("将发送事件: %s", json));
         if (!(e instanceof IgnoreEvent)) {
-            OneBotMirai.logger.debug(String.format("将发送事件: %s", json));
-            this.eventSubscriptionString.add(json);
+            OneBotMirai.logger.info(String.format("将发送事件: %s", json));
+            websocketServer.broadcast(json);
         }
-    }
-    public String subscribeEvent(WebSocket socket){
-        if (eventSubscriptionString.isEmpty()) return "";
-        var send = eventSubscriptionString.poll();
-        socket.send(send);
-        return send;
-
-
-
-    }
-
-    public void unsubscribeEvent(String msg){
-        eventSubscriptionString.remove(msg);
     }
 }
