@@ -53,10 +53,6 @@ public class OneBotWSServer extends WebSocketServer{
             ActionUtils.handleWebSocketActions(conn, botSession.getApiImpl(), json);
         }
 
-
-
-
-
     }
 
     @Override
