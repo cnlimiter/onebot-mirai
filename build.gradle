@@ -1,13 +1,16 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 
-    id 'net.mamoe.mirai-console' version '2.12.3'
+    id 'net.mamoe.mirai-console' version '2.15.0-M1'
+    id 'maven-publish'
 }
 
-group = 'cn.evolvefield.mirai'
-version = '0.1.5'
+group = project.maven_group
+version = project.version
+apply from: file("config.gradle")
 
 java {
     archivesBaseName = 'OneBot-Mirai'
@@ -15,15 +18,26 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+configurations {
+    shadow
+    implementation.extendsFrom shadow
+}
+
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public' }
+    maven {
+        url "https://maven.nova-committee.cn/releases"
+    }
     mavenCentral()
 }
 
 dependencies {
     implementation 'org.projectlombok:lombok:1.18.24'
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.14'
-    implementation 'org.java-websocket:Java-WebSocket:1.5.3'
+    shadow 'org.java-websocket:Java-WebSocket:1.5.3'
+
+    shadow 'cn.evole.bot:OneBot-SDK:0.2.5'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'
     annotationProcessor 'com.alibaba.fastjson2:fastjson2:2.0.14'
@@ -31,8 +45,63 @@ dependencies {
 
 }
 
+shadowJar {
+    project.configurations.shadow.setTransitive(true);
+    configurations = [project.configurations.shadow]
+    relocate 'org.java_websocket', "cn.evole.onebot.sdk.websocket"
+    classifier = ""
+    archiveBaseName.set(project.archives_base_name)
+    archiveVersion.set(project.version)
+
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
     options.release.set(17)
 
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+
+
+            version = "${project.version}"
+            artifactId = "${project.archives_base_name}"
+            groupId = "${project.maven_group}"
+            pom {
+                name = 'OneBot Mirai'
+                description = '基于 [OneBot] 标准的 mirai 插件版'
+                url = 'https://github.com/cnlimiter/onebot-mirai'
+                licenses {
+                    license {
+                        name = 'AGPLV3'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'cnlimiter'
+                        name = 'cnlimiter'
+                        email = 'cnlimiter@163.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        if (System.getenv('MAVEN_USERNAME') != null && System.getenv('MAVEN_PASSWORD') != null) {
+            maven {
+                name 'release'
+                url = 'https://maven.nova-committee.cn/releases'
+
+                credentials {
+                    username System.getenv('MAVEN_USERNAME')
+                    password System.getenv('MAVEN_PASSWORD')
+                }
+            }
+        }
+    }
 }
