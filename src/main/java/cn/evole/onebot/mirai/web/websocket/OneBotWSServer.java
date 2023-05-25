@@ -1,13 +1,12 @@
-package cn.evolvefield.mirai.onebot.web.websocket;
+package cn.evole.onebot.mirai.web.websocket;
 
-import cn.evolvefield.mirai.onebot.OneBotMirai;
-import cn.evolvefield.mirai.onebot.core.BotSession;
-import cn.evolvefield.mirai.onebot.dto.event.meta.HeartbeatMetaEvent;
-import cn.evolvefield.mirai.onebot.dto.response.ActionData;
-import cn.evolvefield.mirai.onebot.util.ActionUtils;
+import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.core.BotSession;
+import cn.evole.onebot.mirai.util.ActionUtils;
+import cn.evole.onebot.sdk.action.ActionData;
+import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import lombok.Getter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;

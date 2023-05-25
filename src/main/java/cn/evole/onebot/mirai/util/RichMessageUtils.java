@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.util;
+package cn.evole.onebot.mirai.util;
 
 import net.mamoe.mirai.message.data.RichMessage;
 import net.mamoe.mirai.message.data.ServiceMessage;

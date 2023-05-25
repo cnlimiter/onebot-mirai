@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.web.queue;
+package cn.evole.onebot.mirai.web.queue;
 
 import net.mamoe.mirai.event.events.BotEvent;
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent;

@@ -1,7 +1,6 @@
-package cn.evolvefield.mirai.onebot.core;
+package cn.evole.onebot.mirai.core;
 
-import cn.evolvefield.mirai.onebot.config.BotConfig;
-import cn.evolvefield.mirai.onebot.config.PluginConfig;
+import cn.evole.onebot.mirai.config.BotConfig;
 import net.mamoe.mirai.Bot;
 
 import java.util.LinkedHashMap;

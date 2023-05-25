@@ -1,6 +1,7 @@
-package cn.evolvefield.mirai.onebot.util;
+package cn.evole.onebot.mirai.util;
 
-import cn.evolvefield.mirai.onebot.OneBotMirai;
+import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.sdk.util.DataBaseUtils;
 import com.alibaba.fastjson2.JSONObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
@@ -68,7 +69,7 @@ public class OnebotMsgParser {
 
         else if (message instanceof MessageSource) return "";
 
-        else if (message instanceof QuoteReply quoteReply) return "[CQ:reply,id="+DataBaseUtils.toMessageId(quoteReply.getSource().getInternalIds(), quoteReply.getSource().getBotId(), quoteReply.getSource().getFromId())+"]";
+        else if (message instanceof QuoteReply quoteReply) return "[CQ:reply,id="+ DataBaseUtils.toMessageId(quoteReply.getSource().getInternalIds(), quoteReply.getSource().getBotId(), quoteReply.getSource().getFromId())+"]";
 
         else if (message instanceof OnlineAudio audio) return "[CQ:record,url="+escape(audio.getUrlForDownload())+",file="+ Arrays.toString(audio.getFileMd5()) +"]";
 

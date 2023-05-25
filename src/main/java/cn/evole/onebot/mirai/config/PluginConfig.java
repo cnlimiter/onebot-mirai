@@ -1,4 +1,4 @@
-package cn.evolvefield.mirai.onebot.config;
+package cn.evole.onebot.mirai.config;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -40,10 +40,10 @@ jobs:
     - name: Build project
       run: |
         gradle wrapper
-        bash gradlew shadow
+        bash gradlew buildPluginLegacy
     
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: onebot-mirai
-        path: build/libs/OneBot-Mirai-*.jar
+        path: build/mirai/OneBot-Mirai-*.mirai.jar
