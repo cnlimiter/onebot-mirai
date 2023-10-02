@@ -8,10 +8,11 @@ import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,63 +23,49 @@ import java.util.concurrent.TimeUnit;
  * Date: 2022/10/14 18:44
  * Version: 1.0
  */
-public class OneBotWSServer extends WebSocketServer{
-    public OneBotWSServer INSTANCE;
+public class OneBotWSClient extends WebSocketClient {
+    public OneBotWSClient INSTANCE;
     private final BotSession botSession;
-    private final int port;
 
-    public OneBotWSServer(BotSession botSession, String host, int port){
-        super(new InetSocketAddress(host, port));
+    public OneBotWSClient(BotSession botSession, String host, int port){
+        super(new URI(host, port));
         this.botSession = botSession;
-        this.port = port;
         this.INSTANCE = this;
-    }
-
-    @Override
-    public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 成功连接", botSession.getBot().getId()));
-
-    }
-
-    @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
-    }
-
-    @Override
-    public void onMessage(WebSocket conn, String message) {
-        var json = JSONObject.parseObject(message);
-
-        if (json.containsKey("action")){
-            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
-            ActionUtils.handleWebSocketActions(conn, botSession.getApiImpl(), json);
-        }
-
-    }
-
-    @Override
-    public void onError(WebSocket conn, Exception ex) {
-        OneBotMirai.logger.warning(String.format("Bot: %s 正向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
-    }
-
-    @Override
-    public void onStart() {
-        OneBotMirai.logger.info(String.format("Bot: %s 正向WebSocket服务端 / 正在监听端口：%s", botSession.getBot().getId(), port));
-    }
-
-
-    public void create() {
-        super.start();
     }
 
     public void close(){
         try {
-            this.stop();
-        } catch (InterruptedException e){
+            this.close(0);
+        } catch (Exception e){
             OneBotMirai.logger.error(String.format("出现错误:\n %s", e));
         }
     }
 
+    @Override
+    public void onOpen(ServerHandshake handshakedata) {
+        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 成功连接", botSession.getBot().getId()));
+    }
+
+    @Override
+    public void onMessage(String message) {
+        var json = JSONObject.parseObject(message);
+
+        if (json.containsKey("action")){
+            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
+            ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
+        }
+    }
+
+    @Override
+    public void onClose(int code, String reason, boolean remote) {
+        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
+
+    }
+
+    @Override
+    public void onError(Exception ex) {
+        OneBotMirai.logger.warning(String.format("Bot: %s 正向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
+    }
 
 
     /**

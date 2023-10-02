@@ -179,9 +179,9 @@ public class ApiMap {
                 case "set_group_name" -> {
                     responseDTO =setGroupName(params);
                 }
-//                case "get_group_honor_info" -> {
-//                    responseDTO =getGroupHonorInfo(params);
-//                }
+                case "get_group_honor_info" -> {
+                    responseDTO =sendMessage(params);
+                }
                 case "get_msg" -> {
                     responseDTO =sendMessage(params);
                 }

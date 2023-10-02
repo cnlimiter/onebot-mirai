@@ -1,6 +1,8 @@
 package cn.evole.onebot.mirai.core;
 
 import cn.evole.onebot.mirai.config.BotConfig;
+import cn.evole.onebot.mirai.core.session.BotSession;
+import lombok.Getter;
 import net.mamoe.mirai.Bot;
 
 import java.util.LinkedHashMap;
@@ -14,11 +16,8 @@ import java.util.LinkedHashMap;
 public class SessionManager{
 
 
+    @Getter
     private static final LinkedHashMap<Long, BotSession> sessions = new LinkedHashMap<>();//一个机器人对应一个websocket连接
-
-    public static LinkedHashMap<Long, BotSession> getSessions() {
-        return sessions;
-    }
 
     public static BotSession get(long botId){
         return sessions.get(botId);
@@ -33,7 +32,6 @@ public class SessionManager{
         sessions.remove(botId);
 
     }
-
 
     public static BotSession createBotSession(Bot bot, BotConfig botConfig){
         var session = new BotSession(bot, botConfig);

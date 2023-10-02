@@ -384,13 +384,13 @@ public class EventMap {
                 return event;
             }
             else return new IgnoreEvent();
-        }
-        else {
+        } else if (botEvent instanceof ImageUploadEvent) {
+            logger.info("即将上传图片");
+            return new IgnoreEvent(botEvent.getBot().getId());
+        } else {
             logger.info(String.format("发生了被插件忽略的事件: %s", botEvent));
             return new IgnoreEvent(botEvent.getBot().getId());
         }
-
-
     }
 
 

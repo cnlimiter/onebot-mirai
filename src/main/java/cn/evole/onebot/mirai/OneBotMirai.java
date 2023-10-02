@@ -38,11 +38,11 @@ public final class OneBotMirai extends JavaPlugin {
                 var botId = String.valueOf(bot.getId());
                 if (PluginConfig.INSTANCE.bots.get().containsKey(botId)){
                     var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
-                    for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
-                        if (mapConfig.get(name).getEnable())
-                            SessionManager.createBotSession(bot, PluginConfig.INSTANCE.bots.get().get(botId).get(name));
+                    //for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
+                    //    if (mapConfig.get(name).getEnable())
+                            SessionManager.createBotSession(bot, mapConfig);
 
-                    }
+                    //}
                 }
                 else {
                     logger.debug(String.format("%s 未进行onebot配置", bot.getId()));
@@ -62,11 +62,14 @@ public final class OneBotMirai extends JavaPlugin {
                     var botId = String.valueOf(onlineEvent.getBot().getId());
                     if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(event.getBot().getId()))){
                         var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
-                        for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
-                            if (mapConfig.get(name).getEnable())
-                                SessionManager.createBotSession(onlineEvent.getBot(), PluginConfig.INSTANCE.bots.get().get(botId).get(name));
+//                        for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
+//                            if (mapConfig.get(name).getEnable())
+//                                SessionManager.createBotSession(onlineEvent.getBot(), PluginConfig.INSTANCE.bots.get().get(botId).get(name));
+//
+//                        }
+                        SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
 
-                        }                    }
+                    }
                     else {
                         logger.debug(String.format("%s 未进行onebot配置", event.getBot().getId()));
                     }

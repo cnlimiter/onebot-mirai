@@ -5,6 +5,7 @@ import cn.evole.onebot.mirai.core.ApiMap;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.java_websocket.WebSocket;
+import org.java_websocket.client.WebSocketClient;
 
 /**
  * Description:

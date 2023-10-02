@@ -1,7 +1,5 @@
 package cn.evole.onebot.mirai.config;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import net.mamoe.mirai.console.data.Value;
 import net.mamoe.mirai.console.data.java.JavaAutoSavePluginConfig;
 
@@ -22,28 +20,14 @@ public class PluginConfig extends JavaAutoSavePluginConfig {
 
     }
 
-    public final Value<Map<String, Map<String, BotConfig>>> bots = typedValue("bots",
-            createKType(Map.class, createKType(String.class), createKType(Map.class, createKType(String.class), createKType(BotConfig.class))),
+    public final Value<Map<String, BotConfig>> bots = typedValue("bots",
+            createKType(Map.class, createKType(String.class), createKType(BotConfig.class)),
             new HashMap<>() {{
-                put("123454321", new HashMap<>() {{
-                    put("ws", new BotConfig());
-                }});
+                put("123454321", new BotConfig());
             }}
     );
 
 
-    @Data
-    public static class DBConfig{
-        boolean enable = true;
-    }
 
-
-
-    @Data
-    @NoArgsConstructor
-    public static class HeartbeatSettings{
-        boolean enable = false;
-        long interval = 1500L;
-    }
 
 }
