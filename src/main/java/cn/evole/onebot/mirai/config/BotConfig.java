@@ -23,7 +23,7 @@ public class BotConfig {
     boolean cacheImage = false;
     boolean cacheRecord = false;
     HeartbeatConfig heartbeat = new HeartbeatConfig();
-    List<WSConfig> ws = new ArrayList<>();
+    WSConfig ws = new WSConfig();
     List<WSReverseConfig> wsReverse = new ArrayList<>();
 
 

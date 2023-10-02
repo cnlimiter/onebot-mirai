@@ -28,7 +28,7 @@ public class OneBotWSClient extends WebSocketClient {
     private final BotSession botSession;
 
     public OneBotWSClient(BotSession botSession, String host, int port){
-        super(new URI(host, port));
+        super( URI.create("ws://"+ host +":" + port));
         this.botSession = botSession;
         this.INSTANCE = this;
     }
@@ -42,7 +42,7 @@ public class OneBotWSClient extends WebSocketClient {
     }
 
     @Override
-    public void onOpen(ServerHandshake handshakedata) {
+    public void onOpen(ServerHandshake handshake) {
         OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 成功连接", botSession.getBot().getId()));
     }
 

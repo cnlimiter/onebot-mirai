@@ -27,20 +27,19 @@ public class BotSession {
     private final Bot bot;
     private final ApiMap apiImpl;
     private final BotConfig botConfig;
-    private final List<OneBotWSServer> websocketServer = new ArrayList<>();
+    private final OneBotWSServer websocketServer;
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
 
     public BotSession(Bot bot, BotConfig botConfig){
         this.bot = bot;
         this.apiImpl = new ApiMap(bot);
         this.botConfig = botConfig;
-        for(BotConfig.WSConfig ws : botConfig.getWs()){
-            OneBotWSServer server = new OneBotWSServer(
-                    this, ws.getWsHost(), ws.getWsPort()
-            );
-            server.create();
-            this.websocketServer.add(server);
-        }
+
+        this.websocketServer = new OneBotWSServer(
+                this, botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()
+        );
+        websocketServer.create();
+
 
         for(BotConfig.WSReverseConfig ws_re : botConfig.getWsReverse()){
             OneBotWSClient client = new OneBotWSClient(
@@ -52,7 +51,7 @@ public class BotSession {
     }
 
     public void close()  {
-        websocketServer.forEach(OneBotWSServer::close);
+        websocketServer.close();
         websocketClient.forEach(OneBotWSClient::close);
     }
 
@@ -61,7 +60,7 @@ public class BotSession {
         var json = JSON.toJSONString(e);
         if (!(e instanceof IgnoreEvent)) {
             OneBotMirai.logger.info(String.format("将发送事件: %s", json));
-            websocketServer.forEach(server -> server.broadcast(json));
+            websocketServer.broadcast(json);
             websocketClient.forEach(server -> server.send(json));
         }
     }
