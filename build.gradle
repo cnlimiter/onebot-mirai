@@ -4,7 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.20'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 
-    id 'net.mamoe.mirai-console' version '2.15.0-M1'
+    id 'net.mamoe.mirai-console' version '2.16.0-RC-dev-146'
     id 'maven-publish'
 }
 
@@ -23,6 +23,7 @@ repositories {
     maven {
         url "https://maven.nova-committee.cn/releases"
     }
+    maven { url "https://repo.mirai.mamoe.net/snapshots" }
     mavenCentral()
 }
 
@@ -31,10 +32,9 @@ dependencies {
     "shadowLink"("org.java-websocket:Java-WebSocket")
     implementation('cn.evole.bot:OneBot-SDK:0.2.5')
     "shadowLink"("cn.evole.bot:OneBot-SDK")
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.14'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
-    compileOnly 'com.alibaba.fastjson2:fastjson2:2.0.14'
-
 
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'

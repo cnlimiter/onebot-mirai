@@ -43,7 +43,7 @@ public class OneBotWSClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 成功连接", botSession.getBot().getId()));
+        OneBotMirai.logger.info(String.format("Bot: %s 反向Websocket服务端 / 成功连接", botSession.getBot().getId()));
     }
 
     @Override
@@ -51,20 +51,20 @@ public class OneBotWSClient extends WebSocketClient {
         var json = JSONObject.parseObject(message);
 
         if (json.containsKey("action")){
-            OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
+            OneBotMirai.logger.debug(String.format("Bot: %s 反向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
             ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
         }
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
+        OneBotMirai.logger.info(String.format("Bot: %s 反向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
 
     }
 
     @Override
     public void onError(Exception ex) {
-        OneBotMirai.logger.warning(String.format("Bot: %s 正向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
+        OneBotMirai.logger.warning(String.format("Bot: %s 反向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
     }
 
 

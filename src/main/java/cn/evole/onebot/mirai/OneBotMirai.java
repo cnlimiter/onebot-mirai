@@ -11,6 +11,8 @@ import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.utils.MiraiLogger;
 
+import java.util.Objects;
+
 public final class OneBotMirai extends JavaPlugin {
     public static final OneBotMirai INSTANCE = new OneBotMirai();
 
@@ -30,15 +32,15 @@ public final class OneBotMirai extends JavaPlugin {
     @Override
     public void onEnable() {
         logger.info("Plugin loaded!");
-        this.reloadPluginData(PluginConfig.INSTANCE);
+        this.reloadPluginConfig(PluginConfig.INSTANCE);
         logger.info("Plugin loaded!");
         logger.info("插件当前Commit 版本: 0.1.5");
         Bot.getInstances().forEach(bot -> {
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
                 var botId = String.valueOf(bot.getId());
-                if (PluginConfig.INSTANCE.bots.get().containsKey(botId)){
-                    var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
-                    //for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
+                if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
+                    var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
+                    //for (String name : PluginConfig.INSTANCE.getBots().get(botId).keySet()){
                     //    if (mapConfig.get(name).getEnable())
                             SessionManager.createBotSession(bot, mapConfig);
 
@@ -60,8 +62,8 @@ public final class OneBotMirai extends JavaPlugin {
             if (event instanceof BotOnlineEvent onlineEvent){
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
                     var botId = String.valueOf(onlineEvent.getBot().getId());
-                    if (PluginConfig.INSTANCE.bots.get().containsKey(String.valueOf(event.getBot().getId()))){
-                        var mapConfig = PluginConfig.INSTANCE.bots.get().get(botId);
+                    if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
+                        var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
 //                        for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
 //                            if (mapConfig.get(name).getEnable())
 //                                SessionManager.createBotSession(onlineEvent.getBot(), PluginConfig.INSTANCE.bots.get().get(botId).get(name));

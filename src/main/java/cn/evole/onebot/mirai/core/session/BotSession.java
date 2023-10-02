@@ -1,7 +1,8 @@
 package cn.evole.onebot.mirai.core.session;
 
 import cn.evole.onebot.mirai.OneBotMirai;
-import cn.evole.onebot.mirai.config.BotConfig;
+import cn.evole.onebot.mirai.config.PluginConfig;
+import cn.evole.onebot.mirai.config.PluginConfig.BotConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
 import cn.evole.onebot.mirai.core.EventMap;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
@@ -41,10 +42,11 @@ public class BotSession {
         websocketServer.create();
 
 
-        for(BotConfig.WSReverseConfig ws_re : botConfig.getWsReverse()){
+        for(PluginConfig.WSReverseConfig ws_re : botConfig.getWsReverse()){
             OneBotWSClient client = new OneBotWSClient(
                     this, ws_re.getReverseHost(), ws_re.getReversePort()
             );
+            client.connect();
             this.websocketClient.add(client);
         }
 
@@ -61,7 +63,9 @@ public class BotSession {
         if (!(e instanceof IgnoreEvent)) {
             OneBotMirai.logger.info(String.format("将发送事件: %s", json));
             websocketServer.broadcast(json);
-            websocketClient.forEach(server -> server.send(json));
+            websocketClient.forEach(client -> {
+                if (client.isOpen()) client.send(json);
+            });
         }
     }
 }

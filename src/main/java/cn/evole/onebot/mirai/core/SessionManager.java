@@ -1,6 +1,6 @@
 package cn.evole.onebot.mirai.core;
 
-import cn.evole.onebot.mirai.config.BotConfig;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
@@ -33,7 +33,7 @@ public class SessionManager{
 
     }
 
-    public static BotSession createBotSession(Bot bot, BotConfig botConfig){
+    public static BotSession createBotSession(Bot bot, PluginConfig.BotConfig botConfig){
         var session = new BotSession(bot, botConfig);
         sessions.put(bot.getId(), session);
         return session;
