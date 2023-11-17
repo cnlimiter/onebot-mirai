@@ -4,7 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.20'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 
-    id 'net.mamoe.mirai-console' version '2.16.0-RC-dev-146'
+     id 'net.mamoe.mirai-console' version '2.12.3'
     id 'maven-publish'
 }
 
@@ -23,7 +23,7 @@ repositories {
     maven {
         url "https://maven.nova-committee.cn/releases"
     }
-    maven { url "https://repo.mirai.mamoe.net/snapshots" }
+    maven { url "https://repo.mirai.mamoe.net/keep/mcl" }
     mavenCentral()
 }
 
