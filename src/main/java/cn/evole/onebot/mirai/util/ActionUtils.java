@@ -2,8 +2,7 @@ package cn.evole.onebot.mirai.util;
 
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.core.ApiMap;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 
@@ -14,17 +13,17 @@ import org.java_websocket.client.WebSocketClient;
  * Version: 1.0
  */
 public class ActionUtils {
-    public static void handleWebSocketActions(WebSocket session, ApiMap api, JSONObject json){
+    public static void handleWebSocketActions(WebSocket session, ApiMap api, JsonObject json){
         try {
-            OneBotMirai.logger.info(String.format("WebSocket收到操作请求: %s", JSON.toJSONString(json)));
-            var echo = json.getString("echo");
-            var action = json.getString("action");
+            OneBotMirai.logger.info(String.format("WebSocket收到操作请求: %s", GsonUtils.getGson().toJson(json)));
+            var echo = json.get("echo").getAsString();
+            var action = json.get("action").getAsString();
 
-            var responseDTO = api.callMiraiApi(action, json.getJSONObject("params"));
+            var responseDTO = api.callMiraiApi(action, json.get("params").getAsJsonObject());
 
             responseDTO.setEcho(echo);
-            var jsonToSend = JSON.toJSONString(responseDTO);
-            OneBotMirai.logger.debug(String.format("WebSocket将返回结果: %s" ,jsonToSend));
+            var jsonToSend = GsonUtils.getGson().toJson(responseDTO);
+            OneBotMirai.logger.info(String.format("WebSocket将返回结果: %s" ,jsonToSend));
             session.send(jsonToSend);
         } catch (Exception e) {
             OneBotMirai.logger.error(e.getMessage());

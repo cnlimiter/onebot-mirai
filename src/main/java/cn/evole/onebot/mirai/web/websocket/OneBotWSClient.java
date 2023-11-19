@@ -1,16 +1,20 @@
 package cn.evole.onebot.mirai.web.websocket;
 
 import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.util.ActionUtils;
+import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.sdk.action.ActionData;
 import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import kotlin.NotImplementedError;
+import net.mamoe.mirai.utils.MiraiLogger;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.concurrent.Executors;
@@ -27,44 +31,68 @@ public class OneBotWSClient extends WebSocketClient {
     public OneBotWSClient INSTANCE;
     private final BotSession botSession;
 
-    public OneBotWSClient(BotSession botSession, String host, int port){
-        super( URI.create("ws://"+ host +":" + port));
+    private static MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE
+            .create(OneBotWSClient.class, "OneBotWsClient");
+
+
+    public OneBotWSClient(BotSession botSession, PluginConfig.WSReverseConfig wsRe) {
+        super(URI.create(constructUri(wsRe)));
+        miraiLogger.info(String.format("初始化连接目标: %s", constructUri(wsRe)));
         this.botSession = botSession;
         this.INSTANCE = this;
+        addHeader("x-self-id", String.valueOf(botSession.getBot().getId()));
+        addHeader("x-client-role", "Universal");
+        String authStr = wsRe.getAccessToken();
+        if (authStr!= null && !authStr.trim().isEmpty()){
+            addHeader("authorization", "Bearer " + authStr);
+        }
+    }
+
+    private static String constructUri(PluginConfig.WSReverseConfig wsRe) {
+        if (!wsRe.getUseUniversal()){
+            throw new NotImplementedError("当前尚未实现非Universal模式，请设置反向代理的universal=true");
+        }
+        // universal path
+        String reversePath = wsRe.getReversePath();
+
+        return "ws://"+ wsRe.getReverseHost() +":" + wsRe.getReversePort() +"/" + reversePath;
     }
 
     public void close(){
         try {
             this.close(0);
         } catch (Exception e){
-            OneBotMirai.logger.error(String.format("出现错误:\n %s", e));
+            miraiLogger.error(String.format("出现错误:\n %s", e));
         }
     }
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        OneBotMirai.logger.info(String.format("Bot: %s 反向Websocket服务端 / 成功连接", botSession.getBot().getId()));
+        miraiLogger.info(String.format("Bot: %s 反向Websocket服务端 / 成功连接", botSession.getBot().getId()));
     }
 
     @Override
     public void onMessage(String message) {
-        var json = JSONObject.parseObject(message);
+        var json = GsonUtils.getGson().toJson((message));
 
-        if (json.containsKey("action")){
-            OneBotMirai.logger.debug(String.format("Bot: %s 反向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
-            ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
-        }
+        miraiLogger.info(String.format("收到消息： %s", json));
+        throw new NotImplementedError("尚不支持ws反向链接");
+//        if (json.containsKey("action")){
+
+//            miraiLogger.debug(String.format("Bot: %s 反向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
+//            ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
+//        }
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        OneBotMirai.logger.info(String.format("Bot: %s 反向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
+        miraiLogger.info(String.format("Bot: %s 反向Websocket服务端 / 连接被关闭 , 状态码： %d, 信息: %s", botSession.getBot().getId(), code, reason));
 
     }
 
     @Override
     public void onError(Exception ex) {
-        OneBotMirai.logger.warning(String.format("Bot: %s 反向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
+        miraiLogger.warning(String.format("Bot: %d 反向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()), ex);
     }
 
 
@@ -79,7 +107,7 @@ public class OneBotWSClient extends WebSocketClient {
                 var data = new ActionData<>();
                 var event = new HeartbeatMetaEvent();
                 data.setData(event);
-                var1.send(JSON.toJSONString(data));
+                var1.send(GsonUtils.getGson().toJson(data));
             }
         };
         service.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);

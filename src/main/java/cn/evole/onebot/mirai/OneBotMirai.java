@@ -10,7 +10,9 @@ import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.utils.MiraiLogger;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Objects;
 
 public final class OneBotMirai extends JavaPlugin {
@@ -35,7 +37,11 @@ public final class OneBotMirai extends JavaPlugin {
         this.reloadPluginConfig(PluginConfig.INSTANCE);
         logger.info("Plugin loaded!");
         logger.info("插件当前Commit 版本: 0.1.5");
-        Bot.getInstances().forEach(bot -> {
+
+        List<Bot> instances = Bot.getInstances();
+        logger.info(String.format("instances length: %d", instances.size()));
+        instances.forEach(bot -> {
+            logger.info(String.format("bot : %d", bot.getId()));
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
                 var botId = String.valueOf(bot.getId());
                 if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
@@ -43,6 +49,7 @@ public final class OneBotMirai extends JavaPlugin {
                     //for (String name : PluginConfig.INSTANCE.getBots().get(botId).keySet()){
                     //    if (mapConfig.get(name).getEnable())
                             SessionManager.createBotSession(bot, mapConfig);
+                        logger.info(String.format("创建配置: %d", bot.getId()));
 
                     //}
                 }
@@ -60,6 +67,7 @@ public final class OneBotMirai extends JavaPlugin {
                 SessionManager.getSessions().get(event.getBot().getId()).triggerEvent(event);
             }
             if (event instanceof BotOnlineEvent onlineEvent){
+                logger.warning(String.format("SessionManager当前session长度： %d", SessionManager.getSessions().size()));
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
                     var botId = String.valueOf(onlineEvent.getBot().getId());
                     if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
@@ -70,10 +78,11 @@ public final class OneBotMirai extends JavaPlugin {
 //
 //                        }
                         SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
+                        logger.warning(String.format("%s 创建反向ws监听", event.getBot().getId()));
 
                     }
                     else {
-                        logger.debug(String.format("%s 未进行onebot配置", event.getBot().getId()));
+                        logger.warning(String.format("%s 未进行onebot配置", event.getBot().getId()));
                     }
                 }
 

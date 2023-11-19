@@ -1,9 +1,15 @@
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.evole.onebot.mirai.config.PluginConfig;
+import cn.evole.onebot.mirai.core.session.BotSession;
+import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
+import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.utils.MiraiLogger;
+import org.java_websocket.server.WebSocketServer;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import server.impl.SimpleWsEchoServer;
 
-import java.net.URI;
+import java.net.InetSocketAddress;
 
 /**
  * Description:
@@ -12,40 +18,30 @@ import java.net.URI;
  * Version: 1.0
  */
 public class WebSocketClientTest{
-    public static WebSocketClient client = null;
+    static WebSocketServer simpleServer;
+
+    @BeforeAll
+    public static void construct(){
+        simpleServer = new SimpleWsEchoServer(new InetSocketAddress(2342));
+        simpleServer.start();
+    }
+
+    @Test
+    public void testConnect() throws InterruptedException {
+        BotSession bsm = Mockito.mock(BotSession.class);
+        Bot bot = Mockito.mock(Bot.class);
+        Mockito.when(bsm.getBot()).thenReturn(bot);
+        Mockito.when(bot.getId()).thenReturn(1L);
+        Mockito.when(bot.getLogger()).thenReturn(MiraiLogger.Factory.INSTANCE.create(this.getClass()));
+        PluginConfig.WSReverseConfig reverseConfig = new PluginConfig.WSReverseConfig();
+        reverseConfig.setReverseHost("localhost");
+        reverseConfig.setReversePort(2342);
+        reverseConfig.setUseUniversal(true);
+        reverseConfig.setAccessToken("testToken");
 
 
-    private static final Logger log = LoggerFactory.getLogger("client");
-    public static void main(String[] args) {
-        if (WebSocketClientTest.client != null) {
-            WebSocketClientTest.client.close();
-        }
-        try {
-            client = new WebSocketClient(new URI("ws://127.0.0.1:8080")) {
-                @Override
-                public void onOpen(ServerHandshake handshakedata) {
-                    log.info("启用框架");
-                }
-
-                @Override
-                public void onMessage(String message) {//执行接收到消息体后的相应操作
-                    log.info(message);
-                }
-
-                @Override
-                public void onClose(int code, String reason, boolean remote) {
-                    log.info("退出连接");
-                }
-
-                @Override
-                public void onError(Exception ex) {
-                    log.warn("出现错误!");
-                    ex.printStackTrace();
-                }
-            };
-            client.connect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        OneBotWSClient oneBotWSClient = new OneBotWSClient(bsm, reverseConfig);
+        oneBotWSClient.connectBlocking();
+        oneBotWSClient.send("hello world");
     }
 }

@@ -3,15 +3,16 @@ package cn.evole.onebot.mirai.web.websocket;
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.util.ActionUtils;
+import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.sdk.action.ActionData;
 import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,18 +48,31 @@ public class OneBotWSServer extends WebSocketServer{
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        var json = JSONObject.parseObject(message);
+        var json = GsonUtils.getGson().fromJson(message, JsonObject.class);
+        OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 收到请求", botSession.getBot().getId()));
 
-        if (json.containsKey("action")){
+        if (json.has("action")){
             OneBotMirai.logger.debug(String.format("Bot: %s 正向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
             ActionUtils.handleWebSocketActions(conn, botSession.getApiImpl(), json);
         }
 
     }
 
+    Executor executor = Executors.newSingleThreadExecutor();
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        OneBotMirai.logger.warning(String.format("Bot: %s 正向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
+        if (OneBotMirai.INSTANCE.isEnabled()) {
+            executor.execute(() ->{
+                int secs = 5;
+                OneBotMirai.logger.warning(String.format("Bot: %s 正向Websocket服务端 / 出现错误， 将在 %d 秒后重试 \n %s", botSession.getBot().getId() , secs, ex.getMessage()));
+                try {
+                    Thread.sleep(secs*1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                start();
+            });
+        }
     }
 
     @Override
@@ -92,7 +106,7 @@ public class OneBotWSServer extends WebSocketServer{
                 var data = new ActionData<>();
                 var event = new HeartbeatMetaEvent();
                 data.setData(event);
-                var1.send(JSON.toJSONString(data));
+                var1.send(GsonUtils.getGson().toJson(data));
             }
         };
         service.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
