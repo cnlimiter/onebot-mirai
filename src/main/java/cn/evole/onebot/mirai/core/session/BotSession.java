@@ -5,13 +5,15 @@ import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.config.PluginConfig.BotConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
 import cn.evole.onebot.mirai.core.EventMap;
+import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSServer;
 import cn.evole.onebot.sdk.event.IgnoreEvent;
-import com.alibaba.fastjson2.JSON;
+import com.google.gson.Gson;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.events.BotEvent;
+import net.mamoe.mirai.utils.MiraiLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,26 +32,30 @@ public class BotSession {
     private final BotConfig botConfig;
     private final OneBotWSServer websocketServer;
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
+    private final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE.create(BotSession.class);
 
     public BotSession(Bot bot, BotConfig botConfig){
         this.bot = bot;
         this.apiImpl = new ApiMap(bot);
         this.botConfig = botConfig;
-
         this.websocketServer = new OneBotWSServer(
                 this, botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()
         );
-        websocketServer.create();
+        if (this.botConfig.getWs().getEnable()){
+            miraiLogger.info(String.format("创建正向服务器：%s, %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+                websocketServer.create();
+        }
 
 
         for(PluginConfig.WSReverseConfig ws_re : botConfig.getWsReverse()){
-            OneBotWSClient client = new OneBotWSClient(
-                    this, ws_re.getReverseHost(), ws_re.getReversePort()
-            );
-            client.connect();
-            this.websocketClient.add(client);
+            if (ws_re.getEnable()){
+                OneBotWSClient client = new OneBotWSClient(
+                        this, ws_re
+                );
+                client.connect();
+                this.websocketClient.add(client);
+            }
         }
-
     }
 
     public void close()  {
@@ -57,15 +63,28 @@ public class BotSession {
         websocketClient.forEach(OneBotWSClient::close);
     }
 
+    private ThreadLocal<Gson> gsonTl = new ThreadLocal<Gson>();
     public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event);
-        var json = JSON.toJSONString(e);
+        var json = GsonUtils.getGson().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
-            OneBotMirai.logger.info(String.format("将发送事件: %s", json));
-            websocketServer.broadcast(json);
-            websocketClient.forEach(client -> {
-                if (client.isOpen()) client.send(json);
-            });
+            if (this.botConfig.getWs().getEnable()){
+                OneBotMirai.logger.info(String.format("将广播正向websocket事件"));
+                websocketServer.broadcast(json);
+            }
+            long sendCount = websocketClient.stream().filter(client -> {
+                try{
+                    if (client.isOpen()) {
+                        client.send(json);
+                    }
+                }catch (Exception ex){
+                    OneBotMirai.logger.warning(String.format("error sending msg"), ex);
+                }
+                return client.isOpen();
+            }).count();
+            OneBotMirai.logger.info(String.format("广播反向websocket事件, 共计发送 :%d", sendCount));
         }
     }
+
+
 }

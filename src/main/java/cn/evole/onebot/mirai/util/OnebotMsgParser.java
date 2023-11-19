@@ -2,16 +2,18 @@ package cn.evole.onebot.mirai.util;
 
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
-import com.alibaba.fastjson2.JSONObject;
+import com.google.gson.JsonObject;
+import kotlin.NotImplementedError;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.data.*;
+import net.mamoe.mirai.utils.ExternalResource;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Description:
@@ -28,12 +30,12 @@ public class OnebotMsgParser {
         if (message instanceof String s){
             return new MessageChainBuilder().append(new PlainText(s)).build();
         }
-        else if (message instanceof JSONObject jsonObject) {
+        else if (message instanceof JsonObject jsonObject) {
             try {
-                var data = jsonObject.getJSONObject("data");
-                if (jsonObject.getJSONObject("type") != null){
-                    if (data.containsKey("text"))
-                        return new MessageChainBuilder().append(new PlainText(data.getJSONObject("text").toString())).build();
+                var data = jsonObject.getAsJsonObject("data");
+                if (jsonObject.has("type")){
+                    if (data.asMap().containsKey("text"))
+                        return new MessageChainBuilder().append(new PlainText(data.get("text").getAsString())).build();
                     else return new MessageChainBuilder().append(textToMessageInternal(bot, contact, message)).build();
                 }
             } catch (NullPointerException e) {
@@ -177,11 +179,11 @@ public class OnebotMsgParser {
             }
             return new PlainText(unescape(msg));
         }
-        else if (message instanceof JSONObject jsonObject){
-            var type = jsonObject.getJSONObject("type").toString();
-            JSONObject data = jsonObject.getJSONObject("data");
+        else if (message instanceof JsonObject jsonObject){
+            var type = jsonObject.get("type").getAsString();
+            JsonObject data = jsonObject.getAsJsonObject("data");
             Map<String, String> args = new HashMap<>();
-            data.forEach((s, o) -> args.put(s, (String) o));
+            data.asMap().forEach((s, o) -> args.put(s, o.isJsonNull()? "": o.getAsString()));
             return convertToMiraiMessage(bot, contact, type, args);
         }
         else return MSG_EMPTY;
@@ -215,7 +217,10 @@ public class OnebotMsgParser {
                 return new PlainText(new String(Character.toChars(Integer.parseInt(args.get("id")))));
             }
             case "image" -> {
-               // return tryResolveMedia("image", contact, args);
+                String file = args.get("file");
+                Message message = constuctImageMsg(file, contact);
+                OneBotMirai.logger.info(String.format("Image: %s", message));
+                return message;
             }
             case "share" -> {
                 return RichMessage.share(
@@ -279,7 +284,41 @@ public class OnebotMsgParser {
 
     }
 
+    private static Message constuctImageMsg(String fileStr, Contact contact) {
+        int index = fileStr.indexOf(":");
+        String protocol;
+        String content;
+        if (index == -1){
+            protocol = "file";
+            content = fileStr;
+        }else{
+            protocol = fileStr.substring(0, index);
+            content = fileStr.substring(index + 3);
+        }
+        switch (protocol) {
+            case "http" -> {
+                throw new NotImplementedError("Not Implemented" );
+            }
+            case "file" -> {
+                File file = new File(content);
+                return ExternalResource.uploadAsImage(file, contact);
+            }
+            case "base64" -> {
+                byte[] decode = Base64.getDecoder().decode(content);
 
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
+                Image image = null;
+                try {
+                    image = ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, ImageType.PNG.getFormatName()).toAutoCloseable(), contact);
+                    return image;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + protocol);
+        }
+
+    }
 
 
 //    File getDataFile(String type,String name){
