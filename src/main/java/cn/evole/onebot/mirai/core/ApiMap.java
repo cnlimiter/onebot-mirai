@@ -67,7 +67,6 @@ public class ApiMap {
             switch (action) {
                 case "send_msg" -> {
                     responseDTO = sendMessage(params);
-                    break;
                 }
                 case "send_private_msg" -> {
                     responseDTO = sendPrivateMessage(params);

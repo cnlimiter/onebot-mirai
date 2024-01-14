@@ -4,7 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.20'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 
-     id 'net.mamoe.mirai-console' version '2.16.0'
+    id 'net.mamoe.mirai-console' version '2.16.0'
     id 'maven-publish'
 }
 
@@ -30,7 +30,7 @@ repositories {
 dependencies {
     implementation('org.java-websocket:Java-WebSocket:1.5.3')
     "shadowLink"("org.java-websocket:Java-WebSocket")
-    implementation('cn.evole.bot:OneBot-SDK:0.2.5')
+    implementation('cn.evole.bot:OneBot-SDK:0.2.6')
     "shadowLink"("cn.evole.bot:OneBot-SDK")
     implementation('com.google.code.gson:gson:2.10.1')
 

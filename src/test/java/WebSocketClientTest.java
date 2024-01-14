@@ -1,6 +1,7 @@
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
+import cn.evole.onebot.sdk.action.ActionData;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.java_websocket.server.WebSocketServer;
@@ -42,6 +43,16 @@ public class WebSocketClientTest{
 
         OneBotWSClient oneBotWSClient = new OneBotWSClient(bsm, reverseConfig);
         oneBotWSClient.connectBlocking();
-        oneBotWSClient.send("hello world");
+        //oneBotWSClient.send("hello world");
+        simpleServer.broadcast("""
+                {
+                    "action": "send_group_msg",
+                    "params": {
+                        "参数名": "参数值",
+                        "参数名2": "参数值"
+                    }
+                }""");
+
+
     }
 }

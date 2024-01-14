@@ -4,6 +4,7 @@ import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.SessionManager;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.event.Event;
 import net.mamoe.mirai.event.GlobalEventChannel;
@@ -16,42 +17,36 @@ import java.util.List;
 import java.util.Objects;
 
 public final class OneBotMirai extends JavaPlugin {
+    public static final String VERSION = "0.1.7";
     public static final OneBotMirai INSTANCE = new OneBotMirai();
 
     public static MiraiLogger logger = INSTANCE.getLogger();
 
-    public PluginConfig config;
     private Listener<? extends Event> initialSubscription = null;
 
     private OneBotMirai() {
-        super(new JvmPluginDescriptionBuilder("cn.evole.mirai.onebot", "0.1.6")
+        super(new JvmPluginDescriptionBuilder("cn.evole.mirai.onebot", VERSION)
                 .name("OneBot Mirai")
                 .author("cnlimiter")
                 .build());
-        //super(JvmPluginDescription.loadFromResource("plugin.yml"));
     }
 
     @Override
     public void onEnable() {
-        logger.info("Plugin loaded!");
         this.reloadPluginConfig(PluginConfig.INSTANCE);
         logger.info("Plugin loaded!");
-        logger.info("插件当前Commit 版本: 0.1.5");
+        logger.info("插件当前Commit 版本: " + VERSION);
 
         List<Bot> instances = Bot.getInstances();
-        logger.info(String.format("instances length: %d", instances.size()));
+        logger.info(String.format("当前存在的机器人数量: %d", instances.size()));
         instances.forEach(bot -> {
             logger.info(String.format("bot : %d", bot.getId()));
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
                 var botId = String.valueOf(bot.getId());
                 if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
                     var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
-                    //for (String name : PluginConfig.INSTANCE.getBots().get(botId).keySet()){
-                    //    if (mapConfig.get(name).getEnable())
-                            SessionManager.createBotSession(bot, mapConfig);
+                    SessionManager.createBotSession(bot, mapConfig);
                         logger.info(String.format("创建配置: %d", bot.getId()));
-
-                    //}
                 }
                 else {
                     logger.debug(String.format("%s 未进行onebot配置", bot.getId()));
@@ -67,16 +62,11 @@ public final class OneBotMirai extends JavaPlugin {
                 SessionManager.getSessions().get(event.getBot().getId()).triggerEvent(event);
             }
             if (event instanceof BotOnlineEvent onlineEvent){
-                logger.warning(String.format("SessionManager当前session长度： %d", SessionManager.getSessions().size()));
+                logger.warning(String.format("当前session长度： %d", SessionManager.getSessions().size()));
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
                     var botId = String.valueOf(onlineEvent.getBot().getId());
                     if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
                         var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
-//                        for (String name : PluginConfig.INSTANCE.bots.get().get(botId).keySet()){
-//                            if (mapConfig.get(name).getEnable())
-//                                SessionManager.createBotSession(onlineEvent.getBot(), PluginConfig.INSTANCE.bots.get().get(botId).get(name));
-//
-//                        }
                         SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
                         logger.warning(String.format("%s 创建反向ws监听", event.getBot().getId()));
 
@@ -123,9 +113,7 @@ public final class OneBotMirai extends JavaPlugin {
     @Override
     public void onDisable() {
         initialSubscription.complete();
-        SessionManager.getSessions().forEach((aLong, botSession) -> {
-            SessionManager.closeSession(aLong);
-        });
+        SessionManager.getSessions().forEach((aLong, botSession) -> SessionManager.closeSession(aLong));
         logger.info("OneBot 已关闭");
     }
 }

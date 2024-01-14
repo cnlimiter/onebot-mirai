@@ -7,6 +7,7 @@ import cn.evole.onebot.mirai.util.ActionUtils;
 import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.sdk.action.ActionData;
 import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
+import com.google.gson.JsonObject;
 import kotlin.NotImplementedError;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.java_websocket.WebSocket;
@@ -31,7 +32,7 @@ public class OneBotWSClient extends WebSocketClient {
     public OneBotWSClient INSTANCE;
     private final BotSession botSession;
 
-    private static MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE
+    private static final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE
             .create(OneBotWSClient.class, "OneBotWsClient");
 
 
@@ -43,7 +44,7 @@ public class OneBotWSClient extends WebSocketClient {
         addHeader("x-self-id", String.valueOf(botSession.getBot().getId()));
         addHeader("x-client-role", "Universal");
         String authStr = wsRe.getAccessToken();
-        if (authStr!= null && !authStr.trim().isEmpty()){
+        if (!authStr.trim().isEmpty()){
             addHeader("authorization", "Bearer " + authStr);
         }
     }
@@ -73,15 +74,14 @@ public class OneBotWSClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        var json = GsonUtils.getGson().toJson((message));
-
-        miraiLogger.info(String.format("收到消息： %s", json));
-        throw new NotImplementedError("尚不支持ws反向链接");
-//        if (json.containsKey("action")){
-
-//            miraiLogger.debug(String.format("Bot: %s 反向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
-//            ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
-//        }
+        miraiLogger.info(String.format("收到原始消息： %s", message));
+        var json = GsonUtils.getGson().fromJson(message, JsonObject.class);
+        //throw new NotImplementedError("尚不支持ws反向链接");
+        if (json.has("action")){
+            miraiLogger.debug(String.format("收到json消息： %s", json));
+            miraiLogger.debug(String.format("Bot: %s 反向Websocket服务端 / 开始处理API请求", botSession.getBot().getId()));
+            ActionUtils.handleWebSocketActions(this, botSession.getApiImpl(), json);
+        }
     }
 
     @Override

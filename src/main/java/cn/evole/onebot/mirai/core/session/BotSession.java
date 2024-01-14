@@ -43,7 +43,7 @@ public class BotSession {
         );
         if (this.botConfig.getWs().getEnable()){
             miraiLogger.info(String.format("创建正向服务器：%s, %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
-                websocketServer.create();
+            websocketServer.create();
         }
 
 
@@ -69,7 +69,7 @@ public class BotSession {
         var json = GsonUtils.getGson().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
             if (this.botConfig.getWs().getEnable()){
-                OneBotMirai.logger.info(String.format("将广播正向websocket事件"));
+                OneBotMirai.logger.info("将广播正向websocket事件");
                 websocketServer.broadcast(json);
             }
             long sendCount = websocketClient.stream().filter(client -> {
@@ -78,7 +78,7 @@ public class BotSession {
                         client.send(json);
                     }
                 }catch (Exception ex){
-                    OneBotMirai.logger.warning(String.format("error sending msg"), ex);
+                    OneBotMirai.logger.warning("error sending msg", ex);
                 }
                 return client.isOpen();
             }).count();

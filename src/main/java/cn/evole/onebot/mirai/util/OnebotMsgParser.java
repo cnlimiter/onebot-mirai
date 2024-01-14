@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Description:
@@ -81,62 +82,59 @@ public class OnebotMsgParser {
 
     }
 
+    private static MessageChain codeToChain(Bot bot, String message, Contact contact){
+        AtomicReference<Message> msg = new AtomicReference<>();
+        PlainText text = new PlainText("");
+        if (message.contains("[CQ:")) {
+            final boolean[] interpreting = {false};
+            var sb = new StringBuilder();
+            final int[] index = {0};
+            List.of(message).forEach(
+                    c -> {
+                        if ("[".equals(c)) {
+                            if (interpreting[0]) {
+                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
+                                return;
+                            } else {
+                                interpreting[0] = true;
+                                if (!sb.isEmpty()) {
+                                    var lastMsg = sb.toString();
+                                    sb.delete(0, sb.length());
+                                    msg.set(textToMessageInternal(bot, contact, lastMsg));
+                                }
+                                sb.append(c);
+                            }
+                        } else if ("]".equals(c)) {
+                            if (!interpreting[0]) {
+                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
+                                return;
+                            } else {
+                                interpreting[0] = false;
+                                sb.append(c);
+                                if (!sb.isEmpty()) {
+                                    var lastMsg = sb.toString();
+                                    sb.delete(0, sb.length());
+                                    msg.set(textToMessageInternal(bot, contact, lastMsg));
+                                }
+                            }
+                        } else {
+                            sb.append(c);
+                        }
+                        index[0]++;
+                    }
+            );
+            if (!sb.isEmpty()) {
+               msg.set(textToMessageInternal(bot, contact, sb.toString()));
+            }
+        } else {
+          text = new PlainText(unescape(message));
+        }
+        return new MessageChainBuilder()
+                .append(msg.get())
+                .append(text)
+                .build();
+    }
 
-
-
-//    private static MessageChain codeToChain(Bot bot, String message, Contact contact){
-//        AtomicReference<Message> msg = new AtomicReference<>();
-//        PlainText text = new PlainText("");
-//        if (message.contains("[CQ:")) {
-//            final boolean[] interpreting = {false};
-//            var sb = new StringBuilder();
-//            final int[] index = {0};
-//            List.of(message).forEach(
-//                    c -> {
-//                        if ("[".equals(c)) {
-//                            if (interpreting[0]) {
-//                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
-//                                return;
-//                            } else {
-//                                interpreting[0] = true;
-//                                if (!sb.isEmpty()) {
-//                                    var lastMsg = sb.toString();
-//                                    sb.delete(0, sb.length());
-//                                    msg.set(textToMessageInternal(bot, contact, lastMsg));
-//                                }
-//                                sb.append(c);
-//                            }
-//                        } else if ("]".equals(c)) {
-//                            if (!interpreting[0]) {
-//                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
-//                                return;
-//                            } else {
-//                                interpreting[0] = false;
-//                                sb.append(c);
-//                                if (!sb.isEmpty()) {
-//                                    var lastMsg = sb.toString();
-//                                    sb.delete(0, sb.length());
-//                                    msg.set(textToMessageInternal(bot, contact, lastMsg));
-//                                }
-//                            }
-//                        } else {
-//                            sb.append(c);
-//                        }
-//                        index[0]++;
-//                    }
-//            );
-//            if (!sb.isEmpty()) {
-//               msg.set(textToMessageInternal(bot, contact, sb.toString()));
-//            }
-//        } else {
-//          text = new PlainText(unescape(message));
-//        }
-//        return new MessageChainBuilder()
-//                .append(msg.get())
-//                .append(text)
-//                .build();
-//    }
-//
 
     private static String escape(String msg){
         return msg.replace("&", "&amp;")
