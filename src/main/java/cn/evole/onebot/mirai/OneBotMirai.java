@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class OneBotMirai extends JavaPlugin {
-    public static final String VERSION = "0.1.7";
+    public static String VERSION;
     public static final OneBotMirai INSTANCE = new OneBotMirai();
 
     public static MiraiLogger logger = INSTANCE.getLogger();
@@ -25,14 +25,12 @@ public final class OneBotMirai extends JavaPlugin {
     private Listener<? extends Event> initialSubscription = null;
 
     private OneBotMirai() {
-        super(new JvmPluginDescriptionBuilder("cn.evole.mirai.onebot", VERSION)
-                .name("OneBot Mirai")
-                .author("cnlimiter")
-                .build());
+        VERSION = getDescription().getVersion().toString();
     }
 
     @Override
     public void onEnable() {
+
         this.reloadPluginConfig(PluginConfig.INSTANCE);
         logger.info("Plugin loaded!");
         logger.info("插件当前Commit 版本: " + VERSION);
@@ -49,7 +47,7 @@ public final class OneBotMirai extends JavaPlugin {
                         logger.info(String.format("创建配置: %d", bot.getId()));
                 }
                 else {
-                    logger.debug(String.format("%s 未进行onebot配置", bot.getId()));
+                    logger.debug(String.format("%s 未进行OneBot配置,请在setting.yml中进行配置", bot.getId()));
                 }
             }
             else {
@@ -62,17 +60,16 @@ public final class OneBotMirai extends JavaPlugin {
                 SessionManager.getSessions().get(event.getBot().getId()).triggerEvent(event);
             }
             if (event instanceof BotOnlineEvent onlineEvent){
-                logger.warning(String.format("当前session长度： %d", SessionManager.getSessions().size()));
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
                     var botId = String.valueOf(onlineEvent.getBot().getId());
                     if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
                         var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                         SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
-                        logger.warning(String.format("%s 创建反向ws监听", event.getBot().getId()));
+                        logger.warning(String.format("%s 创建OneBot Session", event.getBot().getId()));
 
                     }
                     else {
-                        logger.warning(String.format("%s 未进行onebot配置", event.getBot().getId()));
+                        logger.warning(String.format("%s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
                     }
                 }
 
