@@ -7,6 +7,7 @@ import net.mamoe.mirai.console.data.value
 
 object PluginConfig : AutoSavePluginConfig("setting"){
     val bots: MutableMap<String, BotConfig>? by value(mutableMapOf("12345654321" to BotConfig()))
+    val db by value(DBSettings())
 
     @Serializable
     data class BotConfig(

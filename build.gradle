@@ -28,16 +28,19 @@ repositories {
 }
 
 dependencies {
-    implementation('org.java-websocket:Java-WebSocket:1.5.3')
+    implementation("org.java-websocket:Java-WebSocket:1.5.3")
     "shadowLink"("org.java-websocket:Java-WebSocket")
-    implementation('cn.evole.bot:OneBot-SDK:0.2.6')
+    implementation("cn.evole.bot:OneBot-SDK:0.2.7")
     "shadowLink"("cn.evole.bot:OneBot-SDK")
-    implementation('com.google.code.gson:gson:2.10.1')
+    implementation("io.github.pcmind:leveldb:1.2")
+    "shadowLink"("io.github.pcmind:leveldb")
+    implementation("com.google.code.gson:gson:2.10.1")
 
-    compileOnly 'org.projectlombok:lombok:1.18.24'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.java-websocket:Java-WebSocket:1.5.3'
+    compileOnly "org.projectlombok:lombok:1.18.24"
+
+    annotationProcessor "org.projectlombok:lombok:1.18.24"
+    annotationProcessor "org.java-websocket:Java-WebSocket:1.5.3"
 
     testImplementation("ch.qos.logback:logback-classic:1.2.11")
     testImplementation("org.slf4j:slf4j-simple:2.0.7")

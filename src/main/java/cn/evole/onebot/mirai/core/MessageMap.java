@@ -6,14 +6,17 @@ import cn.evole.onebot.sdk.event.Event;
 import cn.evole.onebot.sdk.event.IgnoreEvent;
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent;
 import cn.evole.onebot.sdk.entity.Anonymous;
-import cn.evole.onebot.mirai.util.OnebotMsgParser;
+import cn.evole.onebot.mirai.util.OnebotMsgUtils;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
+import kotlinx.serialization.KSerializer;
+import kotlinx.serialization.Serializable;
+import kotlinx.serialization.descriptors.SerialDescriptor;
+import kotlinx.serialization.encoding.Decoder;
+import kotlinx.serialization.encoding.Encoder;
 import net.mamoe.mirai.contact.AnonymousMember;
 import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.MessageEvent;
-
-import java.io.Serializable;
 
 /**
  * Description:消息转换器
@@ -28,7 +31,7 @@ public class MessageMap {
         final String[] rawMessage = {""};
 
         botEvent.getMessage().forEach(message -> {
-            rawMessage[0] += OnebotMsgParser.toCQString(message);
+            rawMessage[0] += OnebotMsgUtils.toCQString(message);
         });
 
 
@@ -94,8 +97,6 @@ public class MessageMap {
 
     }
 
-    public static class MessageChainOrStringDTO implements Serializable{
 
 
-    }
 }

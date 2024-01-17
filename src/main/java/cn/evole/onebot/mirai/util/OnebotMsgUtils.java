@@ -1,9 +1,13 @@
 package cn.evole.onebot.mirai.util;
 
 import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import kotlin.NotImplementedError;
+import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
@@ -16,35 +20,66 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static cn.evole.onebot.mirai.OneBotMirai.logger;
+import static cn.evole.onebot.mirai.util.RichMessageUtils.jsonMessage;
+import static cn.evole.onebot.mirai.util.RichMessageUtils.xmlMessage;
+
 /**
  * Description:
  * Author: cnlimiter
  * Date: 2022/10/4 2:43
  * Version: 1.0
  */
-public class OnebotMsgParser {
+public class OnebotMsgUtils {
 
 
     private static final PlainText MSG_EMPTY = new PlainText("");
 
     public static MessageChain messageToMiraiMessageChains(Bot bot, Contact contact, Object message, boolean raw){
         if (message instanceof String s){
-            return new MessageChainBuilder().append(new PlainText(s)).build();
+            return raw ? new MessageChainBuilder().append(new PlainText(s)).build():
+                    codeToChain(bot, s, contact)
+                    ;
         }
         else if (message instanceof JsonObject jsonObject) {
+            var messageChain = new MessageChainBuilder();
             try {
                 var data = jsonObject.getAsJsonObject("data");
                 if (jsonObject.has("type")){
                     if (data.asMap().containsKey("text"))
-                        return new MessageChainBuilder().append(new PlainText(data.get("text").getAsString())).build();
-                    else return new MessageChainBuilder().append(textToMessageInternal(bot, contact, message)).build();
+                         messageChain.append(new PlainText(data.get("text").getAsString()));
+                    else messageChain.append(textToMessageInternal(bot, contact, message));
                 }
             } catch (NullPointerException e) {
-                OneBotMirai.logger.warning("Got null when parsing CQ message object");
+                logger.warning("Got null when parsing CQ message object");
                 return null;
             }
+            return messageChain.build();
         }
-        return null;
+        else if (message instanceof JsonArray jsonArray) {
+            var messageChain = new MessageChainBuilder();
+            for (var msg : jsonArray){
+                try {
+                    var data = msg.getAsJsonObject().get("data");
+                    if (msg.getAsJsonObject().has("type")){
+                        if (data.getAsJsonObject().asMap().containsKey("text"))
+                             messageChain.append(new PlainText(data.getAsJsonObject().get("text").getAsString()));
+                        else messageChain.append(textToMessageInternal(bot, contact, message));
+                    }
+                } catch (NullPointerException e) {
+                    logger.warning("Got null when parsing CQ message object");
+                }
+            }
+            return messageChain.build();
+        }
+        else if (message instanceof JsonPrimitive jsonPrimitive) {
+            return raw ? new MessageChainBuilder().append(new PlainText(jsonPrimitive.getAsString())).build():
+                    codeToChain(bot, jsonPrimitive.getAsString(), contact);
+        }
+        else {
+            logger.warning("Cannot determine type of " + message.toString());
+            return null;
+        }
     }
 
      public static String toCQString(SingleMessage message){
@@ -93,7 +128,7 @@ public class OnebotMsgParser {
                     c -> {
                         if ("[".equals(c)) {
                             if (interpreting[0]) {
-                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
+                                logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
                                 return;
                             } else {
                                 interpreting[0] = true;
@@ -106,7 +141,7 @@ public class OnebotMsgParser {
                             }
                         } else if ("]".equals(c)) {
                             if (!interpreting[0]) {
-                                OneBotMirai.logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
+                                logger.error(String.format("CQ消息解析失败：%s，索引：%s", message, Arrays.toString(index)));
                                 return;
                             } else {
                                 interpreting[0] = false;
@@ -195,12 +230,12 @@ public class OnebotMsgParser {
                     return AtAll.INSTANCE;
                 } else {
                     if (contact instanceof Group) {
-                        OneBotMirai.logger.debug("不能在私聊中发送 At。");
+                        logger.debug("不能在私聊中发送 At。");
                         return MSG_EMPTY;
                     } else {
                         var member = contact.getBot().getFriend(Long.parseLong(args.get("qq")));
                         if (member == null) {
-                            OneBotMirai.logger.debug(String.format("无法找到群员：%s", args.get("qq")));
+                            logger.debug(String.format("无法找到群员：%s", args.get("qq")));
                             return MSG_EMPTY;
                         } else {
                            return new At(member.getId());
@@ -217,7 +252,7 @@ public class OnebotMsgParser {
             case "image" -> {
                 String file = args.get("file");
                 Message message = constuctImageMsg(file, contact);
-                OneBotMirai.logger.info(String.format("Image: %s", message));
+                logger.info(String.format("Image: %s", message));
                 return message;
             }
             case "share" -> {
@@ -231,28 +266,25 @@ public class OnebotMsgParser {
             case "record" -> {}
             case "contact" -> {
                 if ("qq".equals(args.get("type"))) {
-                    //return  RichMessageHelper.contactQQ(bot, args["id"]!!.toLong())
+                    return  RichMessageUtils.contactQQ(bot, Long.parseLong(args.get("id")));
                 } else {
                     //return RichMessageHelper.contactGroup(bot, args["id"]!!.toLong())
                 }
 
             }
             case "music" -> {
-//                switch (args.get("type")){
-//                    case "qq" -> { }
-//                }
-//                return when (args["type"]) {
-//                    "qq" -> QQMusic.send(args["id"]!!)
-//                    "163" -> NeteaseMusic.send(args["id"]!!)
-//                    "custom" -> Music.custom(
-//                            args["url"]!!,
-//                            args["audio"]!!,
-//                            args["title"]!!,
-//                            args["content"],
-//                            args["image"]
-//                )
-//                else -> throw IllegalArgumentException("Custom music share not supported anymore")
-//                }
+                switch (args.get("type")){
+                    case "qq" -> { return MusicUtils.QQMusic.send(args.get("id")); }
+                    case "163" -> { return MusicUtils.NeteaseMusic.send(args.get("id")); }
+                    case "custom" -> { return MusicUtils.custom(
+                            args.get("url"),
+                            args.get("audio"),
+                            args.get("title"),
+                            args.get("content"),
+                            args.get("image")
+                    ); }
+                    default -> throw new IllegalArgumentException("Custom music share not supported anymore");
+                }
             }
             case "shake" -> {return PokeMessage.ChuoYiChuo;}
             case "poke" -> {
@@ -269,13 +301,19 @@ public class OnebotMsgParser {
                 }
                 return MSG_EMPTY;
             }
-            case "xml" -> {}
-            case "json" -> {}
+            case "xml" -> {
+                return xmlMessage(args.get("data"));
+            }
+            case "json" -> {
+                return args.get("data")!= null && args.get("data").contains("\"app\":") ? new LightApp(args.get("data")) : jsonMessage(args.get("data"));
+            }
             case "reply" -> {
-
+                if (PluginConfig.INSTANCE.getDb().getEnable() && OneBotMirai.INSTANCE.db != null) {
+                    return MessageSource.quote(MessageChain.deserializeFromJsonString(new String(DataBaseUtils.toByteArray(Integer.parseInt(args.get("id"))))));
+                }
             }
             default -> {
-                OneBotMirai.logger.debug("不支持的 CQ码：${type}");
+                logger.debug("不支持的 CQ码:" + type);
             }
         }
         return MSG_EMPTY;
@@ -318,20 +356,4 @@ public class OnebotMsgParser {
 
     }
 
-
-//    File getDataFile(String type,String name){
-//        arrayOf(
-//                File(PluginBase.dataFolder, type).absolutePath + File.separatorChar,
-//                "data" + File.separatorChar + type + File.separatorChar,
-//                System.getProperty("java.library.path")
-//                        .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + type + File.separatorChar,
-//                ""
-//        ).forEach {
-//            var f = File(it + name).absoluteFile;
-//            if (f.exists()) {
-//                return f;
-//            }
-//        }
-//        return null;
-//    }
 }

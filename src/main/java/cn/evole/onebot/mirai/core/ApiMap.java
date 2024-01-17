@@ -1,26 +1,28 @@
 package cn.evole.onebot.mirai.core;
 
 import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.model.MiraiGroupMemberInfoResp;
+import cn.evole.onebot.mirai.util.*;
 import cn.evole.onebot.sdk.action.ActionData;
-import cn.evole.onebot.sdk.response.common.*;
+import cn.evole.onebot.sdk.response.group.GetMsgResp;
 import cn.evole.onebot.sdk.response.misc.BooleanResp;
-import cn.evole.onebot.sdk.response.common.MessageResponse;
+import cn.evole.onebot.sdk.response.misc.ImgInfoResp;
+import cn.evole.onebot.sdk.response.misc.MiraiResp.*;
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp;
 import cn.evole.onebot.sdk.response.contact.LoginInfoResp;
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp;
 import cn.evole.onebot.sdk.response.group.GroupDataResp;
 import cn.evole.onebot.sdk.response.group.GroupInfoResp;
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp;
-import cn.evole.onebot.mirai.util.BaseUtils;
-import cn.evole.onebot.mirai.util.OnebotMsgParser;
 import cn.evole.onebot.mirai.web.queue.CacheRequestQueue;
 import cn.evole.onebot.mirai.web.queue.CacheSourceQueue;
+import cn.evole.onebot.sdk.response.misc.RecordInfoResp;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonObject;
 import lombok.Getter;
+import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.LowLevelApi;
 import net.mamoe.mirai.Mirai;
@@ -31,15 +33,21 @@ import net.mamoe.mirai.contact.announcement.OfflineAnnouncement;
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent;
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent;
 import net.mamoe.mirai.event.events.NewFriendRequestEvent;
+import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageSource;
+import net.mamoe.mirai.message.data.MessageSourceKind;
 import net.mamoe.mirai.utils.MiraiExperimentalApi;
 
-import javax.swing.text.html.Option;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static cn.evole.onebot.mirai.util.ImgUtils.*;
+import static cn.evole.onebot.mirai.util.VoiceUtils.getCachedRecordFile;
 
 /**
  * Description:
@@ -83,6 +91,11 @@ public class ApiMap {
                 case "send_like" -> {
                     responseDTO =sendLike(params);
                 }
+                case "get_msg" -> {
+                    responseDTO =getMessage(params);
+                }
+
+
                 case "set_group_kick" -> {
                     responseDTO =setGroupKick(params);
                 }
@@ -110,6 +123,10 @@ public class ApiMap {
                 case "set_group_special_title" -> {
                     responseDTO =setGroupSpecialTitle(params);
                 }
+                case "set_group_portrait" -> {
+                    responseDTO =setGroupPortrait(params);
+                }
+
                 case "set_discuss_leave" -> {
                     responseDTO =setDiscussLeave(params);
                 }
@@ -153,10 +170,10 @@ public class ApiMap {
                     responseDTO =getCredentials(params);
                 }
                 case "get_record" -> {
-                    responseDTO =sendMessage(params);
+                    responseDTO =getRecord(params);
                 }
                 case "get_image" -> {
-                    responseDTO =sendMessage(params);
+                    responseDTO =getImage(params);
                 }
                 case "can_send_image" -> {
                     responseDTO =canSendImage(params);
@@ -185,9 +202,6 @@ public class ApiMap {
                 case "get_group_honor_info" -> {
                     responseDTO =sendMessage(params);
                 }
-                case "get_msg" -> {
-                    responseDTO =sendMessage(params);
-                }
                 case "_set_group_notice" -> {
                     responseDTO =setGroupNotice(params);
                 }
@@ -204,7 +218,7 @@ public class ApiMap {
             }
         } catch (IllegalArgumentException e) {
             OneBotMirai.logger.info(e);
-            responseDTO = new InvalidRequest();
+            responseDTO = new InvalidFailure();
         } catch (PermissionDeniedException e) {
             OneBotMirai.logger.info(String.format("机器人无操作权限, 调用的API: / %s", action));
             responseDTO = new MiraiFailure();
@@ -237,67 +251,126 @@ public class ApiMap {
                 return sendPrivateMessage(params);
 
         }
-        return new InvalidRequest();
+        return new InvalidFailure();
+    }
+
+    public ActionData<?> getMessage(JsonObject params) {
+        val messageId = params.get("message_id").getAsInt();
+        if (PluginConfig.INSTANCE.getDb().getEnable()){
+            if (OneBotMirai.INSTANCE.db != null){
+                val message = MessageChain.deserializeFromJsonString(new String(DataBaseUtils.toByteArray(messageId)));
+                StringBuilder rawMessage = new StringBuilder();
+                for (var chain : message){
+                    rawMessage.append(OnebotMsgUtils.toCQString(chain));
+                }
+                MessageSource source = message.get(MessageSource.Key);
+                if (source!=null ){
+                    val data = new ActionData<GetMsgResp>();
+                    data.setStatus("ok");
+                    data.setRetCode(0);
+                    val resp = new GetMsgResp();
+                    resp.setTime(source.getTime());
+                    resp.setMessageId(messageId);
+                    resp.setRealId(messageId);
+                    resp.setRawMessage(rawMessage.toString());
+                    GetMsgResp.Sender sender = new GetMsgResp.Sender();
+                    sender.setUserId(String.valueOf(source.getFromId()));
+                    sender.setNickname("UNKNOWN");
+                    resp.setSender(sender);
+                    if (source.getKind() == MessageSourceKind.GROUP){
+                        resp.setMsgType("group");
+                        data.setData(resp);
+                        return data;
+                    }
+                    else if (source.getKind() == MessageSourceKind.FRIEND || source.getKind() == MessageSourceKind.STRANGER || source.getKind() == MessageSourceKind.TEMP){
+                        resp.setMsgType("private");
+                        data.setData(resp);
+                        return data;
+                    }
+                    else  {
+                        var failure = new PluginFailure();
+                        failure.setData("未知消息类型");
+                        return failure;
+                    }
+                }
+                else {
+                    var failure = new PluginFailure();
+                    failure.setData("数据库未正常初始化");
+                    return failure;
+                }
+
+            }
+            else {
+                var failure = new PluginFailure();
+                failure.setData("消息为空");
+                return failure;
+            }
+        }
+        else {
+            var failure = new InvalidFailure();
+            failure.setData("请配置开启数据库");
+            return failure;
+        }
     }
 
     public ActionData<?> sendGroupMessage(JsonObject params) {
-        var targetGroupId = params.get("group_id").getAsLong();
-        var raw = params.has("auto_escape") && params.get("auto_escape").getAsBoolean();
-        var messages = params.get("message").getAsJsonArray();
+        val targetGroupId = params.get("group_id").getAsLong();
+        val raw = params.has("auto_escape") && params.get("auto_escape").getAsBoolean();
+        val messages = params.get("message").getAsJsonArray();
 
-        MessageResponse r = new MessageResponse(-1);;
+        MessageSuccess r = new MessageSuccess(-1);;
 
         for (JsonElement message : messages.asList()) {
-            var group = bot.getGroupOrFail(targetGroupId);
-            var messageChain = OnebotMsgParser.messageToMiraiMessageChains(bot, group, message, raw);
+            val group = bot.getGroupOrFail(targetGroupId);
+            val messageChain = OnebotMsgUtils.messageToMiraiMessageChains(bot, group, message, raw);
             if (messageChain != null && !messageChain.contentToString().isEmpty()) {
-                var receipt = group.sendMessage(messageChain);
+                val receipt = group.sendMessage(messageChain);
                 cachedSourceQueue.add(receipt.getSource());
-                r = new MessageResponse(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
+                r = new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
             }
         }
         return r;
     }
 
     public ActionData<?> sendPrivateMessage(JsonObject params) {
-        var targetQQId = params.get("user_id").getAsLong();
-        var raw = params.has("auto_escape") || params.get("auto_escape").getAsBoolean();
-        var messages = params.get("message");
+        val targetQQId = params.get("user_id").getAsLong();
+        val raw = params.has("auto_escape") || params.get("auto_escape").getAsBoolean();
+        val messages = params.get("message");
         Contact contact;
 
 
         try {
             contact = bot.getFriendOrFail(targetQQId);
         } catch (NoSuchElementException e) {
-            var fromGroupId = cachedTempContact.get(targetQQId);
+            val fromGroupId = cachedTempContact.get(targetQQId);
             //?: bot.groups.find { group -> group.members.contains(targetQQId) }?.id
             contact = bot.getGroupOrFail(fromGroupId).getOrFail(targetQQId);
         }
-        var messageChain = OnebotMsgParser.messageToMiraiMessageChains(bot, contact, messages, raw);
+        val messageChain = OnebotMsgUtils.messageToMiraiMessageChains(bot, contact, messages, raw);
         if (messageChain != null && !messageChain.contentToString().isEmpty()) {
-            var receipt = contact.sendMessage(messageChain);
+            val receipt = contact.sendMessage(messageChain);
             cachedSourceQueue.add(receipt.getSource());
-            return new MessageResponse(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
+            return new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
         } else {
-            return new MessageResponse(-1);
+            return new MessageSuccess(-1);
         }
 
     }
 
     //delete
     public ActionData<?> deleteMessage(JsonObject params) {
-        var messageId = params.get("message_id").getAsInt();
+        val messageId = params.get("message_id").getAsInt();
         MessageSource.recall(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();
+        return new Success();
     }
 
 
     public ActionData<?> setGroupKick(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var rejectAddRequest = params.has("reject_add_request") && params.get("reject_add_request").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val rejectAddRequest = params.has("reject_add_request") && params.get("reject_add_request").getAsBoolean();
         bot.getGroupOrFail(groupId).getOrFail(memberId).kick("", rejectAddRequest);
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> sendLike(JsonObject params) {
@@ -307,99 +380,108 @@ public class ApiMap {
 
     //set
     public ActionData<?> setGroupBan(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var duration = params.get("duration").getAsInt();
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val duration = params.get("duration").getAsInt();
         if (duration == 0) {
             bot.getGroupOrFail(groupId).getOrFail(memberId).unmute();
         } else {
             bot.getGroupOrFail(groupId).getOrFail(memberId).mute(duration);
         }
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupAnonymousBan(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
+        val groupId = params.get("group_id").getAsLong();
         String flag = "";
-        var flag1 = params.get("anonymous").getAsJsonObject().get("flag").getAsString();
-        var flag2 = params.get("anonymous_flag").getAsString();
-        var flag3 = params.get("flag").getAsString();
+        val flag1 = params.get("anonymous").getAsJsonObject().get("flag").getAsString();
+        val flag2 = params.get("anonymous_flag").getAsString();
+        val flag3 = params.get("flag").getAsString();
         if (flag1.isEmpty()) flag = flag2.isEmpty() ? flag3 : flag2;
-        var duration = params.has("duration") ? params.get("duration").getAsInt() :30 * 60;
+        val duration = params.has("duration") ? params.get("duration").getAsInt() :30 * 60;
 
-        var splits = flag.split("&", 2);
+        val splits = flag.split("&", 2);
         Mirai.getInstance().muteAnonymousMember(bot, splits[0], splits[1], groupId, duration);
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setWholeGroupBan(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var enable = params.has("enable") && params.get("enable").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val enable = params.has("enable") && params.get("enable").getAsBoolean();
 
         bot.getGroupOrFail(groupId).getSettings().setMuteAll(enable);
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupAdmin(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var enable = params.has("enable") && params.get("enable").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val enable = params.has("enable") && params.get("enable").getAsBoolean();
 
         bot.getGroupOrFail(groupId).getOrFail(memberId).modifyAdmin(enable);
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupCard(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var card = params.get("card").getAsString().isEmpty() ? "" : params.get("card").getAsString();
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val card = params.get("card").getAsString().isEmpty() ? "" : params.get("card").getAsString();
 
         bot.getGroupOrFail(groupId).getOrFail(memberId).setNameCard(card);
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupLeave(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var dismiss = params.has("is_dismiss") && params.get("is_dismiss").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val dismiss = params.has("is_dismiss") && params.get("is_dismiss").getAsBoolean();
 
         // Not supported
         if (dismiss) return new MiraiFailure();
 
         bot.getGroupOrFail(groupId).quit();
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupSpecialTitle(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var specialTitle = params.get("special_title").getAsString().isEmpty() ? "" : params.get("special_title").getAsString();
-        var duration = params.has("duration") ? params.get("duration"):-1;
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val specialTitle = params.get("special_title").getAsString().isEmpty() ? "" : params.get("special_title").getAsString();
+        val duration = params.has("duration") ? params.get("duration"):-1;
 
         bot.getGroupOrFail(groupId).getOrFail(memberId).setSpecialTitle(specialTitle);
-        return new GeneralSuccess();
+        return new Success();
+    }
+
+    public ActionData<?> setGroupPortrait(JsonObject params) {
+        val groupId = params.get("group_id").getAsLong();
+        val file = params.get("file").getAsString();
+        val cache = params.has("cache") ? params.get("cache").getAsInt() : 1;
+
+        //bot.getGroupOrFail(groupId).avatarUrl();
+        return new MiraiFailure();
     }
 
     public ActionData<?> setFriendAddRequest(JsonObject params) {
-        var flag = params.get("flag").getAsString();
-        var approve = params.has("approve") && params.get("approve").getAsBoolean();
-        var remark = params.get("remark");// unuse.getAsString()d
+        val flag = params.get("flag").getAsString();
+        val approve = params.has("approve") && params.get("approve").getAsBoolean();
+        val remark = params.get("remark");// unuse.getAsString()d
 
-        var event = cacheRequestQueue.get(Long.parseLong(flag));
+        val event = cacheRequestQueue.get(Long.parseLong(flag));
         if (event instanceof NewFriendRequestEvent requestEvent)
             if (approve) requestEvent.accept();
             else requestEvent.reject(false);
-        else return new InvalidRequest();
+        else return new InvalidFailure();
 
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setGroupAddRequest(JsonObject params) {
-        var flag = params.get("flag").getAsString();
-        var type = params.get("type"); // unuse.getAsString()d
-        var subType = params.get("sub_type"); // unuse.getAsString()d
-        var approve = params.has("approve") && params.get("approve").getAsBoolean();
-        var reason = params.get("reason").getAsString();
-        var event = cacheRequestQueue.get(Long.parseLong(flag));
+        val flag = params.get("flag").getAsString();
+        val type = params.get("type"); // unuse.getAsString()d
+        val subType = params.get("sub_type"); // unuse.getAsString()d
+        val approve = params.has("approve") && params.get("approve").getAsBoolean();
+        val reason = params.get("reason").getAsString();
+        val event = cacheRequestQueue.get(Long.parseLong(flag));
         if (event instanceof MemberJoinRequestEvent requestEvent)
             if (approve) requestEvent.accept();
             else requestEvent.reject(true, reason);
@@ -407,7 +489,7 @@ public class ApiMap {
             if (approve) requestEvent.accept();
             else requestEvent.ignore();
         }
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> sendDiscussMessage(JsonObject params) {
@@ -415,12 +497,9 @@ public class ApiMap {
     }
 
     public ActionData<?> setGroupAnonymous(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var enable = params.get("enable") != null ? params.get("enable") : true;
-
-        //todo
-        // Not supported
-        // bot.getGroupOrFail(groupId).settings.isAnonymousChatEnabled = enable
+        val groupId = params.get("group_id").getAsLong();
+        val enable = params.has("enable") && params.get("enable").getAsBoolean();
+        bot.getGroupOrFail(groupId).getSettings().setAnonymousChatEnabled(enable);
         return new MiraiFailure();
     }
 
@@ -432,7 +511,7 @@ public class ApiMap {
     //get
     public ActionData<?> getLoginInfo(JsonObject params) {
         LoginInfoResp loginInfo = new LoginInfoResp(bot.getId(), bot.getNick());
-        var data = new ActionData<LoginInfoResp>();
+        val data = new ActionData<LoginInfoResp>();
         data.setData(loginInfo);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -440,27 +519,27 @@ public class ApiMap {
     }
 
     public ActionData<?> sendQQProfile(JsonObject params) {
-        var nick = params.get("nickname").getAsString();
-        var company = params.get("company").getAsString();
-        var email = params.get("email").getAsString();
-        var college = params.get("college").getAsString();
-        var personalNote = params.get("personal_note").getAsString();
+        val nick = params.get("nickname").getAsString();
+        val company = params.get("company").getAsString();
+        val email = params.get("email").getAsString();
+        val college = params.get("college").getAsString();
+        val personalNote = params.get("personal_note").getAsString();
 
         return new MiraiFailure();
     }
 
 
     public ActionData<?> getStrangerInfo(JsonObject params) {
-        var userId = params.get("user_id").getAsLong();
+        val userId = params.get("user_id").getAsLong();
 
-        var profile = Mirai.getInstance().queryProfile(bot, userId);
+        val profile = Mirai.getInstance().queryProfile(bot, userId);
         StrangerInfoResp loginInfo = new StrangerInfoResp();
         loginInfo.setUserId(userId);
         loginInfo.setNickname(profile.getNickname());
         loginInfo.setSex(profile.getSex().name().toLowerCase());
         loginInfo.setAge(profile.getAge());
         loginInfo.setLevel(profile.getQLevel());
-        var data = new ActionData<StrangerInfoResp>();
+        val data = new ActionData<StrangerInfoResp>();
         data.setData(loginInfo);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -468,11 +547,11 @@ public class ApiMap {
     }
 
     public ActionData<?> getFriendList(JsonObject params) {
-        var friendList = new LinkedList<FriendInfoResp>();
+        val friendList = new LinkedList<FriendInfoResp>();
         bot.getFriends().forEach(friend -> {
             friendList.add(new FriendInfoResp(friend.getId(), friend.getNick(), friend.getRemark()));
         });
-        var data = new ActionData<>();
+        val data = new ActionData<>();
         data.setData(friendList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -480,12 +559,12 @@ public class ApiMap {
     }
 
     public ActionData<?> getGroupList(JsonObject params) {
-        var groupList = new LinkedList<GroupDataResp>();
+        val groupList = new LinkedList<GroupDataResp>();
         bot.getGroups().forEach(group ->
                 groupList.add(new GroupDataResp(group.getId(), group.getName())));
         {
         }
-        var data = new ActionData<>();
+        val data = new ActionData<>();
         data.setData(groupList);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -497,17 +576,17 @@ public class ApiMap {
      * 不支持获取群容量, 返回0
      */
     public ActionData<?> getGroupInfo(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var noCache = params.has("no_cache") && params.get("no_cache").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val noCache = params.has("no_cache") && params.get("no_cache").getAsBoolean();
 
-        var group = bot.getGroupOrFail(groupId);
-        var groupInfo = new GroupInfoResp();
+        val group = bot.getGroupOrFail(groupId);
+        val groupInfo = new GroupInfoResp();
         groupInfo.setGroupId(group.getId());
         groupInfo.setGroupName(group.getName());
         groupInfo.setMemberCount(group.getMembers().size() + 1);//加上机器人本身
         groupInfo.setMaxMemberCount(0);
         groupInfo.setGroupCreateTime(group.getOwner().getJoinTimestamp());//mirai没有直接接口，采用群主加入群的时间，一般情况下均可以实现，除了转让群
-        var data = new ActionData<GroupInfoResp>();
+        val data = new ActionData<GroupInfoResp>();
         data.setData(groupInfo);
         data.setStatus("ok");
         data.setRetCode(0);
@@ -517,18 +596,18 @@ public class ApiMap {
     @MiraiExperimentalApi
     @LowLevelApi
     public ActionData<?> getGroupMemberInfo(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var memberId = params.get("user_id").getAsLong();
-        var noCache = params.has("no_cache") && params.get("no_cache").getAsBoolean();
+        val groupId = params.get("group_id").getAsLong();
+        val memberId = params.get("user_id").getAsLong();
+        val noCache = params.has("no_cache") && params.get("no_cache").getAsBoolean();
 
-        var group = bot.getGroupOrFail(groupId);
-        var data = new ActionData<GroupMemberInfoResp>();
+        val group = bot.getGroupOrFail(groupId);
+        val data = new ActionData<GroupMemberInfoResp>();
         if (noCache) {
-            var groupUin = Mirai.getInstance().getUin(group);
-            var members = Mirai.getInstance().getRawGroupMemberList(bot, groupUin, groupId, group.getOwner().getId());
+            val groupUin = Mirai.getInstance().getUin(group);
+            val members = Mirai.getInstance().getRawGroupMemberList(bot, groupUin, groupId, group.getOwner().getId());
 
-            var groupMemberInfo = new GroupMemberInfoResp();
-            var member = BaseUtils.copyIterator(members.iterator())
+            val groupMemberInfo = new GroupMemberInfoResp();
+            val member = BaseUtils.copyIterator(members.iterator())
                     .stream()
                     .filter(memberInfo -> memberInfo.getUin() == memberId)
                     .findFirst();
@@ -556,7 +635,7 @@ public class ApiMap {
             }
 
         } else {
-            var member = bot.getGroupOrFail(groupId).getOrFail(memberId);
+            val member = bot.getGroupOrFail(groupId).getOrFail(memberId);
 
             data.setData(new MiraiGroupMemberInfoResp(member));
             data.setStatus("ok");
@@ -566,13 +645,13 @@ public class ApiMap {
     }
 
     public ActionData<?> getGroupMemberList(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var groupMemberListData = new LinkedList<GroupMemberInfoResp>();
-        var data = new ActionData<>();
+        val groupId = params.get("group_id").getAsLong();
+        val groupMemberListData = new LinkedList<GroupMemberInfoResp>();
+        val data = new ActionData<>();
 
         AtomicBoolean isBotIncluded = new AtomicBoolean(false);
-        var group = bot.getGroupOrFail(groupId);
-        var members = group.getMembers();
+        val group = bot.getGroupOrFail(groupId);
+        val members = group.getMembers();
         members.forEach(member -> {
             if (member.getId() == bot.getId()) isBotIncluded.set(true);
             groupMemberListData.add(new MiraiGroupMemberInfoResp(member));
@@ -585,59 +664,72 @@ public class ApiMap {
     }
 
 
-//    public ActionData<?> getRecord(JsonObject params){
-//        var file = params.get("file").getAsString();
-//        var outFormat = params.get("out_format").getAsString().isEmpty() ? "" : params.get("out_format");// Currently not supporte.getAsString()d
-//        var cachedFile = getCachedRecordFile(file)
-//        cachedFile?.let {
-//            var fileType = with(it.readBytes().copyOfRange(0, 10).toUHexString("")) {
-//                when {
-//                    startsWith("2321414D52") -> "amr"
-//                    startsWith("02232153494C4B5F5633") -> "silk"
-//                    else -> "unknown"
-//                }
-//            }
-//            return ResponseDTO.RecordInfo(
-//                    RecordInfoData(
-//                            it.absolutePath,
-//                            it.nameWithoutExtension,
-//                            it.nameWithoutExtension,
-//                            fileType
-//                    )
-//            )
-//        } ?: return ResponseDTO.PluginFailure()
-//    }
+    public ActionData<?> getRecord(JsonObject params){
+        val file = params.get("file").getAsString();
+        val outFormat = params.get("out_format").getAsString().isEmpty() ? "" : params.get("out_format");// Currently not support
+        val cachedFile = getCachedRecordFile(file);
+        if (cachedFile!=null){
+            byte[] b1 = new byte[10];
+            try {
+                System.arraycopy(Files.readAllBytes(cachedFile.toPath()), 0, b1, 0, 10);
+                String fileType = BaseUtils.bytesToString(b1);
+                if (fileType.startsWith("2321414D52")) fileType = "amr";
+                else if (fileType.startsWith("02232153494C4B5F5633")) fileType = "silk";
+                else fileType = "unknown";
+                val data = new ActionData<RecordInfoResp>();
+                data.setStatus("ok");
+                data.setRetCode(0);
+                data.setData(
+                        new RecordInfoResp(
+                                cachedFile.getAbsolutePath(),
+                                StringUtils.substringBeforeLast(cachedFile.getName(), "."),
+                                StringUtils.substringBeforeLast(cachedFile.getName(), "."),
+                                fileType
+                ));
+                return data;
+            }catch (Exception ignored){}
+        }
+        return new PluginFailure();
+    }
 
-//    public ActionData<?> getImage(JsonObject params){
-//        var file = params["file"].string
-//
-//        var image = getCachedImageFile(file)
-//        image?.let { cachedImageMeta ->
-//                var cachedFile = getDataFile("image", cachedImageMeta.fileName)
-//            if (cachedFile == null) {
-//                HttpClient.getBytes(cachedImageMeta.url)?.let { saveImage(cachedImageMeta.fileName, it) }
-//            }
-//            cachedFile = getDataFile("image", cachedImageMeta.fileName)
-//
-//            cachedFile?.let {
-//                var fileType = getImageType(it.readBytes())
-//                return ResponseDTO.ImageInfo(
-//                        ImageInfoData(
-//                                it.absolutePath,
-//                                cachedImageMeta.fileName,
-//                                cachedImageMeta.md5,
-//                                cachedImageMeta.size,
-//                                cachedImageMeta.url,
-//                                cachedImageMeta.addTime,
-//                                fileType
-//                        )
-//                )
-//            }
-//        } ?: return ResponseDTO.PluginFailure()
-//    }
+    public ActionData<?> getImage(JsonObject params){
+        val file = params.get("file").getAsString();
+
+        val image = getCachedImageFile(file);
+        if (image!=null){
+            File cachedFile = BaseUtils.getDataFile("image", image.fileName());
+            if (cachedFile == null && HttpUtils.getBytesFromHttpUrl(image.url()) != null) {
+                OneBotMirai.INSTANCE.saveImageOrRecord(image.fileName(), HttpUtils.getBytesFromHttpUrl(image.url()), true);
+            }
+            cachedFile = BaseUtils.getDataFile("image", image.fileName());
+            if (cachedFile!= null){
+                try {
+                    val fileType = getImageType(Files.readAllBytes(cachedFile.toPath()));
+                    val data = new ActionData<ImgInfoResp>();
+                    data.setStatus("ok");
+                    data.setRetCode(0);
+                    data.setData(new ImgInfoResp(
+                            cachedFile.getAbsolutePath(),
+                            image.fileName(),
+                            image.md5(),
+                            image.size(),
+                            image.url(),
+                            image.addTime(),
+                            fileType
+                    ));
+                    return data;
+                }
+                catch (IOException ignored){}
+            }
+            else {
+                return new PluginFailure();
+            }
+        }
+        return new PluginFailure();
+    }
 
     public ActionData<?> canSendImage(JsonObject params) {
-        var data = new ActionData<BooleanResp>();
+        val data = new ActionData<BooleanResp>();
         data.setData(new BooleanResp(true));
         data.setStatus("ok");
         data.setRetCode(0);
@@ -645,7 +737,7 @@ public class ApiMap {
     }
 
     public ActionData<?> canSendRecord(JsonObject params) {
-        var data = new ActionData<BooleanResp>();
+        val data = new ActionData<BooleanResp>();
         data.setData(new BooleanResp(true));
         data.setStatus("ok");
         data.setRetCode(0);
@@ -653,42 +745,46 @@ public class ApiMap {
     }
 
     public ActionData<?> getStatus(JsonObject params) {
-        var data = new ActionData<PluginStatusResp>();
+        val data = new ActionData<PluginStatus>();
         data.setStatus("ok");
         data.setRetCode(0);
-        data.setData(new PluginStatusResp());
+        val status = new PluginStatus();
+        status.setOnline(bot.isOnline());
+        data.setData(status);
         return data;
     }
 
 
     public ActionData<?> getVersionInfo(JsonObject params) {
-        var data = new ActionData<VersionInfo>();
-        data.setData(new VersionInfo());
+        val data = new ActionData<VersionInfo>();
         data.setStatus("ok");
         data.setRetCode(0);
+        val versionInfo = new VersionInfo();
+        versionInfo.setCoolq_directory(OneBotMirai.INSTANCE.getDataFolder().getAbsolutePath());
+        data.setData(versionInfo);
         return data;
     }
 
     public ActionData<?> setGroupName(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var name = params.get("group_name").getAsString();
+        val groupId = params.get("group_id").getAsLong();
+        val name = params.get("group_name").getAsString();
         if (!"".equals(name)) {
             bot.getGroupOrFail(groupId).setName(name);
-            return new GeneralSuccess();
+            return new Success();
         } else {
-            return new InvalidRequest();
+            return new InvalidFailure();
         }
     }
 
 //    @MiraiExperimentalApi
 //    @LowLevelApi
 //    public ActionData<?> getGroupHonorInfo(JsonObject params) {
-//        var groupId = params.get("group_id").getAsLong();
-//        var type = params.get("type").getAsString();
+//        val groupId = params.get("group_id").getAsLong();
+//        val type = params.get("type").getAsString();
 //
 //        GroupHonorInfoResp finalData = new GroupHonorInfoResp(bot, groupId, type);
 //
-//        var data = new ActionData<GroupHonorInfoResp>();
+//        val data = new ActionData<GroupHonorInfoResp>();
 //        data.setStatus("ok");
 //        data.setRetCode(0);
 //        data.setData(finalData);
@@ -697,13 +793,13 @@ public class ApiMap {
 
 
     public ActionData<?> setGroupNotice(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var content = params.get("content").getAsString();
+        val groupId = params.get("group_id").getAsLong();
+        val content = params.get("content").getAsString();
         if (!"".equals(content)) {
             bot.getGroupOrFail(groupId).getAnnouncements().publish(OfflineAnnouncement.create(content));
-            return new GeneralSuccess();
+            return new Success();
         } else {
-            return new InvalidRequest();
+            return new InvalidFailure();
         }
     }
     //todo
@@ -723,16 +819,16 @@ public class ApiMap {
     }
 
     public ActionData<?> cleanDataDir(JsonObject params) {
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> cleanPluginLog(JsonObject params) {
-        return new GeneralSuccess();
+        return new Success();
     }
 
     public ActionData<?> setRestartPlugin(JsonObject params) {
-        var delay = params.get("delay");// unuse.getAsInt()d
-        return new GeneralSuccess();
+        val delay = params.get("delay");// unuse.getAsInt()d
+        return new Success();
     }
 
 
@@ -742,9 +838,9 @@ public class ApiMap {
     @MiraiExperimentalApi
     @LowLevelApi
     public ActionData<?> getWordSlice(JsonObject params) {
-        var content = params.get("content").getAsString();
+        val content = params.get("content").getAsString();
 
-        return new GeneralSuccess();
+        return new Success();
 
     }
 
@@ -752,27 +848,27 @@ public class ApiMap {
     ////addition ///
     ///////////////
     public ActionData<?> getGroupRootFiles(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
+        val groupId = params.get("group_id").getAsLong();
 
         //Mirai.getInstance().getFileCacheStrategy()
         //bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();
+        return new Success();
 
     }
 
     public ActionData<?> setEssenceMsg(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var messageId = params.get("message_id").getAsInt();
+        val groupId = params.get("group_id").getAsLong();
+        val messageId = params.get("message_id").getAsInt();
         bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();
+        return new Success();
 
     }
 
     public ActionData<?> deleteEssenceMsg(JsonObject params) {
-        var groupId = params.get("group_id").getAsLong();
-        var messageId = params.get("message_id").getAsInt();
+        val groupId = params.get("group_id").getAsLong();
+        val messageId = params.get("message_id").getAsInt();
         //bot.getGroupOrFail(groupId).setEssenceMessage(cachedSourceQueue.get(messageId));
-        return new GeneralSuccess();//todo 等待mirai的api
+        return new Success();//todo 等待mirai的api
 
     }
 
