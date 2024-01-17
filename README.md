@@ -1,15 +1,17 @@
 <div align="center">
 
-# OneBot Mirai
+<h1>OneBot Mirai</h1> 
+欢迎回到Mirai
 
-_✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)标准的 mirai  插件版✨_
+_✨ 对接[OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)标准的 mirai 插件✨_
+
 </div>
 <hr>
 <p align="center">
     <a href="https://github.com/cnlimiter/onebot-mirai/issues"><img src="https://img.shields.io/github/issues/cnlimiter/onebot-mirai?style=flat" alt="issues" /></a>
-    <a href="https://jitci.com/gh/cnlimiter/onebot-mirai"><img src="https://jitci.com/gh/cnlimiter/onebot-mirai/svg" alt="jitci" /></a>
     <a href="https://github.com/cnlimiter/onebot-mirai/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLV3-green" alt="License"/></a>
-    <a href="https://github.com/howmanybots/onebot"><img src="https://img.shields.io/badge/OneBot-v11-blue?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAIVBMVEUAAAAAAAADAwMHBwceHh4UFBQNDQ0ZGRkoKCgvLy8iIiLWSdWYAAAAAXRSTlMAQObYZgAAAQVJREFUSMftlM0RgjAQhV+0ATYK6i1Xb+iMd0qgBEqgBEuwBOxU2QDKsjvojQPvkJ/ZL5sXkgWrFirK4MibYUdE3OR2nEpuKz1/q8CdNxNQgthZCXYVLjyoDQftaKuniHHWRnPh2GCUetR2/9HsMAXyUT4/3UHwtQT2AggSCGKeSAsFnxBIOuAggdh3AKTL7pDuCyABcMb0aQP7aM4AnAbc/wHwA5D2wDHTTe56gIIOUA/4YYV2e1sg713PXdZJAuncdZMAGkAukU9OAn40O849+0ornPwT93rphWF0mgAbauUrEOthlX8Zu7P5A6kZyKCJy75hhw1Mgr9RAUvX7A3csGqZegEdniCx30c3agAAAABJRU5ErkJggg=="></a>
+    <a href="https://github.com/howmanybots/onebot"><img src="https://img.shields.io/badge/OneBot-v11-blue?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAIVBMVEUAAAAAAAADAwMHBwceHh4UFBQNDQ0ZGRkoKCgvLy8iIiLWSdWYAAAAAXRSTlMAQObYZgAAAQVJREFUSMftlM0RgjAQhV+0ATYK6i1Xb+iMd0qgBEqgBEuwBOxU2QDKsjvojQPvkJ/ZL5sXkgWrFirK4MibYUdE3OR2nEpuKz1/q8CdNxNQgthZCXYVLjyoDQftaKuniHHWRnPh2GCUetR2/9HsMAXyUT4/3UHwtQT2AggSCGKeSAsFnxBIOuAggdh3AKTL7pDuCyABcMb0aQP7aM4AnAbc/wHwA5D2wDHTTe56gIIOUA/4YYV2e1sg713PXdZJAuncdZMAGkAukU9OAn40O849+0ornPwT93rphWF0mgAbauUrEOthlX8Zu7P5A6kZyKCJy75hhw1Mgr9RAUvX7A3csGqZegEdniCx30c3agAAAABJRU5ErkJggg==" alt=""></a>
+    <a href=""><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/cnlimiter/onebot-mirai?style=flat&color=abcdef"></a>
 
 </p>
 
@@ -23,9 +25,10 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 
 ### 接口
 - [x] 正向 WebSocket
+- [x] 反向 WebSocket
 - [ ] HTTP API
 - [ ] 反向 HTTP POST
-- [ ] 反向 WebSocket
+
 ### 实现
 <details>
 <summary>已实现 CQ 码</summary>
@@ -43,7 +46,7 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 | [CQ:reply]   | 回复           |
 | [CQ:forward] | 合并转发         |
 | [CQ:node]    | 合并转发节点       |
-| [CQ:xml]     | XML 消息]      |
+| [CQ:xml]     | XML 消息       |
 | [CQ:json]    | JSON 消息      |
 
 </details>
@@ -58,6 +61,7 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 | /send_private_msg        | 发送私聊消息     | 
 | /send_group_msg          | 发送群消息      |
 | /send_msg                | 发送消息       |
+| /get_msg                 | 获取消息       |
 | /delete_msg              | 撤回信息       |
 | /set_group_kick          | 群组踢人       |
 | /set_group_ban           | 群组单人禁言     |
@@ -65,6 +69,8 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 | /set_group_admin         | 群组设置管理员    |
 | /set_group_card          | 设置群名片（群备注） |
 | /set_group_name          | 设置群名       |
+| /get_image               | 获取图片信息     |
+| /get_record              | 获取语音       |
 | /set_group_leave         | 退出群组       |
 | /set_group_special_title | 设置群组专属头衔   |
 | /set_friend_add_request  | 处理加好友请求    |
@@ -79,6 +85,7 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 | /get_group_member_list   | 获取群成员列表    |
 | /get_group_honor_info    | 获取群荣誉信息    |
 | /get_version_info        | 获取版本信息     |
+| /get_status              | 获取状态       |
 
 [//]: # (| /can_send_image          | [检查是否可以发送图片]   |)
 [//]: # (| /can_send_record         | [检查是否可以发送语音]   |)
@@ -127,9 +134,18 @@ _✨ 基于 [OneBot](https://github.com/howmanybots/onebot/blob/master/README.md
 - [onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)  -  [LICENSE](https://github.com/yyuueexxiinngg/onebot-kotlin/blob/dev/LICENSE)  
 - [mirai-api-http](https://github.com/mamoe/mirai-api-http) -  [LICENSE](https://github.com/mamoe/mirai-api-http/blob/master/LICENSE)  
 - [Mirai Native](https://github.com/iTXTech/mirai-native)  -  [LICENSE](https://github.com/iTXTech/mirai-native/blob/master/LICENSE)  
-- [CQHTTP](https://github.com/richardchien/coolq-http-api) -  [LICENSE](https://github.com/richardchien/coolq-http-api/blob/master/LICENSE)  
-
+- [CQHTTP](https://github.com/richardchien/coolq-http-api) -  [LICENSE](https://github.com/richardchien/coolq-http-api/blob/master/LICENSE)
 - [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)  -  [LICENSE](https://github.com/Mrs4s/go-cqhttp/blob/master/LICENSE)
+
+## 友情链接
+兼容 [OneBot-v11 ](https://github.com/howmanybots/onebot)标准的一些项目🥰  
+
+| 项目地址                                                                      | 核心作者           | 备注                  |
+|---------------------------------------------------------------------------|----------------|---------------------|
+| [MrXiaoM/Overflow](https://github.com/MrXiaoM/Overflow)                   | MrXiaoM        | 实现 mirai 的无缝迁移      |
+| [LagrangeDev/Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) | NepPure        | C#实现 By Konata.Core |
+| [whitechi73/OpenShamrock](https://github.com/whitechi73/OpenShamrock)     | whitechi73     | Xposed框架hook实现      |
+| [Hoshinonyaruko/Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo)     | Hoshinonyaruko | 基于官方api 轻量 原生跨平台    |
 
 
 
