@@ -1,4 +1,4 @@
-package cn.evole.onebot.mirai.core;
+package cn.evole.onebot.mirai.core.session;
 
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;

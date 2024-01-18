@@ -1,12 +1,12 @@
 package cn.evole.onebot.mirai;
 
 import cn.evole.onebot.mirai.config.PluginConfig;
-import cn.evole.onebot.mirai.core.SessionManager;
+import cn.evole.onebot.mirai.core.session.SessionManager;
+import cn.evole.onebot.mirai.database.NanoDb;
 import cn.evole.onebot.mirai.util.BaseUtils;
 import cn.evole.onebot.mirai.util.DBUtils;
 import cn.evole.onebot.mirai.util.HttpUtils;
 import cn.evole.onebot.sdk.util.FileUtils;
-import cn.evole.onebot.sdk.util.NetUtils;
 import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.Mirai;
@@ -21,9 +21,6 @@ import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.OnlineAudio;
 import net.mamoe.mirai.utils.MiraiLogger;
-import org.iq80.leveldb.DB;
-import org.iq80.leveldb.Options;
-import org.iq80.leveldb.impl.Iq80DBFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +46,7 @@ public final class OneBotMirai extends JavaPlugin {
 
     private final File imageFolder = new File(getDataFolder(), "image");
     private final File recordFolder = new File(getDataFolder(), "record");
-    public DB db  = null;
+    public NanoDb<byte[], byte[]> db  = null;
 
     @Override
     public void onEnable() {
@@ -58,10 +55,9 @@ public final class OneBotMirai extends JavaPlugin {
         FileUtils.checkFolder(imageFolder.toPath());
         FileUtils.checkFolder(recordFolder.toPath());
         if (PluginConfig.INSTANCE.getDb().getEnable()) {
-            val options = new Options().createIfMissing(true);
             try {
-                db = new Iq80DBFactory().open(new File(getDataFolderPath() + "/db"), options);
-            } catch (IOException ignored) {
+                db = new NanoDb<>(getDataFolderPath() + "/db.udb");
+            } catch (Exception ignored) {
             }
         }
 
@@ -102,6 +98,7 @@ public final class OneBotMirai extends JavaPlugin {
                         val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                         val session = SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
                         logger.info(String.format("机器人 %s 创建 OneBot Session", event.getBot().getId()));
+                        if (PluginConfig.INSTANCE.getDebug()) logger.info("OneBot Session: " + session.toString());
                     }
                     else {
                         logger.warning(String.format("机器人 %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
@@ -197,6 +194,7 @@ public final class OneBotMirai extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        this.db.save();
         initialSubscription.complete();
         SessionManager.getSessions().forEach((aLong, botSession) -> SessionManager.closeSession(aLong));
         logger.info("OneBot 已关闭");

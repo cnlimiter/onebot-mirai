@@ -34,9 +34,10 @@ dependencies {
     "shadowLink"("cn.evole.bot:OneBot-SDK")
     implementation("io.github.pcmind:leveldb:1.2")
     "shadowLink"("io.github.pcmind:leveldb"){transitive = false}
+    implementation ("io.github.kongweiguang:KHTTP:0.0.3")
+    "shadowLink"("io.github.kongweiguang:KHTTP")
+
     implementation("com.google.code.gson:gson:2.10.1")
-
-
     compileOnly "org.projectlombok:lombok:1.18.24"
 
     annotationProcessor "org.projectlombok:lombok:1.18.24"

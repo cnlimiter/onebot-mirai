@@ -1,6 +1,7 @@
 package cn.evole.onebot.mirai.web.websocket;
 
 import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.util.ActionUtils;
 import cn.evole.onebot.mirai.util.GsonUtils;
@@ -28,10 +29,10 @@ public class OneBotWSServer extends WebSocketServer{
     private final BotSession botSession;
     private final int port;
 
-    public OneBotWSServer(BotSession botSession, String host, int port){
-        super(new InetSocketAddress(host, port));
+    public OneBotWSServer(BotSession botSession, PluginConfig.BotConfig config){
+        super(new InetSocketAddress(config.getWs().getWsHost(), config.getWs().getWsPort()));
         this.botSession = botSession;
-        this.port = port;
+        this.port = config.getWs().getWsPort();
         this.INSTANCE = this;
     }
 
@@ -45,6 +46,7 @@ public class OneBotWSServer extends WebSocketServer{
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         OneBotMirai.logger.info(String.format("Bot: %s 正向Websocket服务端 / 连接被关闭", botSession.getBot().getId()));
     }
+
 
     @Override
     public void onMessage(WebSocket conn, String message) {

@@ -1,7 +1,10 @@
 package cn.evole.onebot.mirai.util;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,8 +55,8 @@ public class HttpUtils {
     /**
      * 从网络上获取资源
      *
-     * @param url
-     * @return
+     * @param url 网址
+     * @return 字符串
      */
     public static String getStringFromHttpUrl(String url) {
         try {
@@ -167,4 +170,102 @@ public class HttpUtils {
         }
         return title;
     }
+
+    /**
+     *
+     * @param dest 目标地址
+     * @param header 请求头
+     * @return 返回值
+     */
+    public static String get(String dest, Properties header) {
+        try {
+            URL url = new URL(dest);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            if (header != null) {
+                for (String s : header.stringPropertyNames()) {
+                    con.setRequestProperty(s, header.getProperty(s));
+                }
+            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder sbf = new StringBuilder();
+            String temp;
+            while ((temp = br.readLine()) != null) {
+                sbf.append(temp);
+                sbf.append("\r\n");
+            }
+            return sbf.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param dest 目标地址
+     * @param data 数据
+     * @param header 请求头
+     * @return 返回值
+     */
+    public static String post(String dest, String data, Properties header) {
+        try {
+            URL url = new URL(dest);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            if (header != null) {
+                for (String s : header.stringPropertyNames()) {
+                    con.setRequestProperty(s, header.getProperty(s));
+                }
+            }
+            con.setDoOutput(true);
+            con.getOutputStream().write(data.getBytes(StandardCharsets.UTF_8));
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder sbf = new StringBuilder();
+            String temp;
+            while ((temp = br.readLine()) != null) {
+                sbf.append(temp);
+                sbf.append("\r\n");
+            }
+            return sbf.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param dest 目标地址
+     * @param data 数据
+     * @param header 请求头
+     * @return 返回值
+     */
+    public static String jsonPost(String dest, String data, Properties header) {
+        try {
+            URL url = new URL(dest);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            if (header != null) {
+                for (String s : header.stringPropertyNames()) {
+                    con.setRequestProperty(s, header.getProperty(s));
+                }
+            }
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoOutput(true);
+            byte[] requestBodyBytes = data.getBytes(StandardCharsets.UTF_8);
+            con.setRequestProperty("Content-Length", Integer.toString(requestBodyBytes.length));
+            con.getOutputStream().write(requestBodyBytes);
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder sbf = new StringBuilder();
+            String temp;
+            while ((temp = br.readLine()) != null) {
+                sbf.append(temp);
+                sbf.append("\r\n");
+            }
+            return sbf.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

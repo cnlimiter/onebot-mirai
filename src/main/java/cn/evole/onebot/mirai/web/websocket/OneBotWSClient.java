@@ -6,8 +6,10 @@ import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.util.ActionUtils;
 import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.sdk.action.ActionData;
+import cn.evole.onebot.sdk.enums.ActionPathEnum;
 import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
 import com.google.gson.JsonObject;
+import io.github.kongweiguang.khttp.KHTTP;
 import kotlin.NotImplementedError;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.java_websocket.WebSocket;
@@ -18,9 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Description:正向websocket服务器
@@ -57,6 +61,10 @@ public class OneBotWSClient extends WebSocketClient {
         String reversePath = wsRe.getReversePath();
 
         return "ws://"+ wsRe.getReverseHost() +":" + wsRe.getReversePort() +"/" + reversePath;
+    }
+
+    public void create(){
+        this.connect();
     }
 
     public void close(){

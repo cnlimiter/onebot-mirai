@@ -8,7 +8,8 @@ import net.mamoe.mirai.console.data.value
 object PluginConfig : AutoSavePluginConfig("setting"){
     val bots: MutableMap<String, BotConfig>? by value(mutableMapOf("12345654321" to BotConfig()))
     val db by value(DBSettings())
-    val debug : Boolean = false
+    val debug by value(false)
+    val proxy by value("")
 
     @Serializable
     data class BotConfig(
@@ -34,7 +35,7 @@ object PluginConfig : AutoSavePluginConfig("setting"){
 
     @Serializable
     data class HTTPConfig(
-        var enable: Boolean = false,
+        var enable: Boolean = true,
         var host: String = "0.0.0.0",
         var port: Int = 6700,
         var accessToken: String = "",
