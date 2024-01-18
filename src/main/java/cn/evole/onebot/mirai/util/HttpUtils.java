@@ -1,5 +1,7 @@
 package cn.evole.onebot.mirai.util;
 
+import net.mamoe.mirai.utils.MiraiLogger;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -240,7 +242,7 @@ public class HttpUtils {
      * @param header 请求头
      * @return 返回值
      */
-    public static String jsonPost(String dest, String data, Properties header) {
+    public static String jsonPost(MiraiLogger miraiLogger, String dest, String data, Properties header) {
         try {
             URL url = new URL(dest);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -255,13 +257,18 @@ public class HttpUtils {
             byte[] requestBodyBytes = data.getBytes(StandardCharsets.UTF_8);
             con.setRequestProperty("Content-Length", Integer.toString(requestBodyBytes.length));
             con.getOutputStream().write(requestBodyBytes);
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder sbf = new StringBuilder();
-            String temp;
-            while ((temp = br.readLine()) != null) {
-                sbf.append(temp);
-                sbf.append("\r\n");
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                String temp;
+                while ((temp = br.readLine()) != null) {
+                    sbf.append(temp);
+                    sbf.append("\r\n");
+                }
             }
+            catch (Exception e){
+                miraiLogger.warning("HTTP上报超时");
+            }
+
             return sbf.toString();
         } catch (Exception e) {
             return null;

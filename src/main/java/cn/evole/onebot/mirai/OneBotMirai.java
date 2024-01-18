@@ -98,7 +98,7 @@ public final class OneBotMirai extends JavaPlugin {
                         val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                         val session = SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
                         logger.info(String.format("机器人 %s 创建 OneBot Session", event.getBot().getId()));
-                        if (PluginConfig.INSTANCE.getDebug()) logger.info("OneBot Session: " + session.toString());
+                        if (PluginConfig.INSTANCE.getDebug()) logger.info("OneBot Session: " + session);
                     }
                     else {
                         logger.warning(String.format("机器人 %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));

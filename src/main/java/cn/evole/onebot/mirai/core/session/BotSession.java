@@ -4,20 +4,27 @@ import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.config.PluginConfig.BotConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
 import cn.evole.onebot.mirai.core.EventMap;
+import cn.evole.onebot.mirai.util.BaseUtils;
 import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.mirai.util.HttpUtils;
 import cn.evole.onebot.mirai.web.http.OneBotHttpServer;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSServer;
 import cn.evole.onebot.sdk.event.IgnoreEvent;
+import cn.evole.onebot.sdk.util.json.JsonsObject;
 import com.google.gson.Gson;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.events.BotEvent;
 import net.mamoe.mirai.utils.MiraiLogger;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Description:功能实现单元
@@ -35,6 +42,7 @@ public class BotSession {
     private final OneBotWSServer websocketServer;
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
     private final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE.create(BotSession.class);
+    private Mac sha1Util = null;
 
 
     @Override
@@ -45,7 +53,7 @@ public class BotSession {
                 OneBot HTTP Server: %s,
                 OneBot WS Server: %s,
                 OneBot WS Clients: %s
-                """.formatted(this.bot.getBot().getId(), this.botConfig.toString(), this.httpServer.getAddress(), this.websocketServer.getAddress(), this.websocketClient.size())
+                """.formatted(this.bot.getId(), this.botConfig.toString(), this.httpServer.getAddress(), this.websocketServer.getAddress(), this.websocketClient.size())
                 ;
     }
 
@@ -55,6 +63,7 @@ public class BotSession {
         this.botConfig = botConfig;
         this.httpServer = new OneBotHttpServer(this, botConfig);
         this.websocketServer = new OneBotWSServer(this, botConfig);
+
 
 
         if (this.botConfig.getHttp().getEnable()){
@@ -91,9 +100,25 @@ public class BotSession {
         if (!(e instanceof IgnoreEvent)) {
             var debug = PluginConfig.INSTANCE.getDebug();
 
+
             if (this.botConfig.getHttp().getEnable()){
                 if (debug) this.miraiLogger.info("将上报http事件");
-                HttpUtils.jsonPost(this.botConfig.getHttp().getPostUrl(), json, null);
+                Properties header = new Properties();
+                header.putIfAbsent("User-Agent", "CQHttp/4.15.0");
+                header.putIfAbsent("X-Self-ID", bot.getId());
+                if (!botConfig.getHttp().getSecret().isEmpty()) header.putIfAbsent("X-Signature", BaseUtils.getSha(json, "SHA-1", false));
+                var response = HttpUtils.jsonPost(this.miraiLogger, this.botConfig.getHttp().getPostUrl(), json, header);
+                if (response != null){
+                    if (debug) this.miraiLogger.info("收到上报响应 %s".formatted(response));
+                    try {
+                        var respJson = new JsonsObject(response);
+                        var sentJson = new JsonsObject(json);
+                        //var params = hashMapOf("context" to sentJson, "operation" to respJson)
+                        //miraiApi.handleQuickOperation(params)
+                    } catch (Exception e1) {
+                        this.miraiLogger.error("解析HTTP上报返回数据成json失败");
+                    }
+                }
             }
 
             if (this.botConfig.getWs().getEnable()){
@@ -119,6 +144,5 @@ public class BotSession {
 
         }
     }
-
 
 }
