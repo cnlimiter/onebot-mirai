@@ -26,8 +26,8 @@ _✨ 对接[OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)
 ### 接口
 - [x] 正向 WebSocket
 - [x] 反向 WebSocket
-- [ ] HTTP API
-- [ ] 反向 HTTP POST
+- [x] HTTP API
+- [x] 反向 HTTP POST
 
 ### 实现
 <details>

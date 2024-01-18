@@ -1,6 +1,6 @@
 id: cn.evole.mirai.onebot
 main: cn.evole.mirai.onebot.OneBotMirai
-version: 0.2.0
+version: 0.2.1
 name: OneBot_Mirai
 author: cnlimiter
 dependencies: [ ]
