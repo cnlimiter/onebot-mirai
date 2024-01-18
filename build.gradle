@@ -33,7 +33,7 @@ dependencies {
     implementation("cn.evole.bot:OneBot-SDK:0.2.7")
     "shadowLink"("cn.evole.bot:OneBot-SDK")
     implementation("io.github.pcmind:leveldb:1.2")
-    "shadowLink"("io.github.pcmind:leveldb")
+    "shadowLink"("io.github.pcmind:leveldb"){transitive = false}
     implementation("com.google.code.gson:gson:2.10.1")
 
 

@@ -34,6 +34,18 @@ public class BotSession {
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
     private final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE.create(BotSession.class);
 
+
+    @Override
+    public String toString() {
+        return """
+                Bot Id: %s,
+                Bot Config: %s,
+                OneBot Clients: %s,
+                OneBot Server: %s
+                """.formatted(bot.getBot().getId(), botConfig.toString(), websocketClient.size(), websocketServer.getAddress())
+                ;
+    }
+
     public BotSession(Bot bot, BotConfig botConfig){
         this.bot = bot;
         this.apiImpl = new ApiMap(bot);
@@ -68,21 +80,28 @@ public class BotSession {
         var e = EventMap.toDTO(event);
         var json = GsonUtils.getGson().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
+            var debug = PluginConfig.INSTANCE.getDebug();
             if (this.botConfig.getWs().getEnable()){
-                OneBotMirai.logger.info("将广播正向websocket事件");
+                if (debug) OneBotMirai.logger.info("将广播正向websocket事件");
                 websocketServer.broadcast(json);
             }
-            long sendCount = websocketClient.stream().filter(client -> {
-                try{
-                    if (client.isOpen()) {
-                        client.send(json);
-                    }
-                }catch (Exception ex){
-                    OneBotMirai.logger.warning("error sending msg", ex);
+
+            for(PluginConfig.WSReverseConfig ws_re : botConfig.getWsReverse()){
+                if (ws_re.getEnable()){
+                    long sendCount = websocketClient.stream().filter(client -> {
+                        try{
+                            if (client.isOpen()) {
+                                client.send(json);
+                            }
+                        }catch (Exception ex){
+                            OneBotMirai.logger.warning("error sending msg", ex);
+                        }
+                        return client.isOpen();
+                    }).count();
+                    if (debug)  OneBotMirai.logger.info(String.format("将广播反向websocket事件, 共计发送 :%d", sendCount));
                 }
-                return client.isOpen();
-            }).count();
-            OneBotMirai.logger.info(String.format("广播反向websocket事件, 共计发送 :%d", sendCount));
+            }
+
         }
     }
 

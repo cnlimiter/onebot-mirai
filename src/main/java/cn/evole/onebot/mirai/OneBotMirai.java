@@ -4,14 +4,22 @@ import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.SessionManager;
 import cn.evole.onebot.mirai.util.BaseUtils;
 import cn.evole.onebot.mirai.util.DBUtils;
+import cn.evole.onebot.mirai.util.HttpUtils;
 import cn.evole.onebot.sdk.util.FileUtils;
+import cn.evole.onebot.sdk.util.NetUtils;
 import lombok.val;
 import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.Mirai;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
+import net.mamoe.mirai.contact.Friend;
+import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.event.Event;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.*;
+import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.OnlineAudio;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
@@ -23,6 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
+
+import static cn.evole.onebot.mirai.util.ImgUtils.constructCacheImageMeta;
+import static cn.evole.onebot.mirai.util.ImgUtils.getImageType;
 
 public final class OneBotMirai extends JavaPlugin {
     public static String VERSION;
@@ -36,8 +47,8 @@ public final class OneBotMirai extends JavaPlugin {
         VERSION = getDescription().getVersion().toString();
     }
 
-    private File imageFolder = new File(getDataFolder(), "image");
-    private File recordFolder = new File(getDataFolder(), "record");
+    private final File imageFolder = new File(getDataFolder(), "image");
+    private final File recordFolder = new File(getDataFolder(), "record");
     public DB db  = null;
 
     @Override
@@ -65,9 +76,9 @@ public final class OneBotMirai extends JavaPlugin {
         instances.forEach(bot -> {
             logger.info(String.format("bot : %d", bot.getId()));
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
-                var botId = String.valueOf(bot.getId());
+                val botId = String.valueOf(bot.getId());
                 if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
-                    var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
+                    val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                     SessionManager.createBotSession(bot, mapConfig);
                         logger.info(String.format("创建配置: %d", bot.getId()));
                 }
@@ -86,23 +97,24 @@ public final class OneBotMirai extends JavaPlugin {
             }
             if (event instanceof BotOnlineEvent onlineEvent){
                 if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
-                    var botId = String.valueOf(onlineEvent.getBot().getId());
+                    val botId = String.valueOf(onlineEvent.getBot().getId());
                     if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
-                        var mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
-                        SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
-                        logger.warning(String.format("%s 创建OneBot Session", event.getBot().getId()));
-
+                        val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
+                        val session = SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
+                        logger.info(String.format("机器人 %s 创建 OneBot Session", event.getBot().getId()));
                     }
                     else {
-                        logger.warning(String.format("%s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
+                        logger.warning(String.format("机器人 %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
                     }
                 }
 
             }
             else if (event instanceof MessageEvent messageEvent){
-                if (SessionManager.containsSession(messageEvent.getBot().getId())) {
+                val bot = messageEvent.getBot();
+                val botId = bot.getId();
+                if (SessionManager.containsSession(botId)) {
                     DBUtils.saveMessageToDB(messageEvent);//存入数据库
-                    var session = SessionManager.get(messageEvent.getBot().getId());
+                    val session = SessionManager.get(botId);
                     if (messageEvent instanceof GroupMessageEvent groupMessageEvent){
                         session.getApiImpl().getCachedSourceQueue().add(groupMessageEvent.getSource());
                     }
@@ -110,23 +122,73 @@ public final class OneBotMirai extends JavaPlugin {
                         session.getApiImpl().getCachedTempContact()
                                 .put(groupTempMessageEvent.getSender().getId(), groupTempMessageEvent.getGroup().getId());
                     }
+                    if (session.getBotConfig().getCacheImage()){
+                        messageEvent.getMessage().stream()
+                                .filter(singleMessage -> singleMessage instanceof Image)
+                                .forEach(singleMessage -> {
+                                    val img = (Image) singleMessage;
+                                    long imageSize;
+                                    val imageMD5 = BaseUtils.bytesToHexString(img.getMd5());
+                                    val subject = messageEvent.getSubject();
+                                    if (subject instanceof Member || subject instanceof Friend){
+                                        val imageHeight = img.getHeight();
+                                        val imageWidth = img.getWidth();
+                                        imageSize = (long) imageHeight * imageWidth;
+                                    }
+                                    else if (subject instanceof Group){
+                                        imageSize = img.getSize();
+                                    }
+                                    else imageSize = 0;
+
+                                    val imgMetaContent = constructCacheImageMeta(
+                                            imageMD5,
+                                            imageSize,
+                                            Mirai.getInstance().queryImageUrl(bot, img),
+                                            getImageType(img)
+                                    );
+                                    saveImageOrRecord(
+                                            img.getImageId() + ".cqimg",
+                                            imgMetaContent,
+                                            true
+                                    );
+
+                                });
+                    }
+                    if (session.getBotConfig().getCacheRecord()){
+                        messageEvent.getMessage().stream()
+                                .filter(singleMessage -> singleMessage instanceof OnlineAudio)
+                                .forEach(singleMessage -> {
+                                    val audio = (OnlineAudio) singleMessage;
+                                    val voiceUrl = audio.getUrlForDownload();
+                                    val voiceBytes = HttpUtils.getBytesFromHttpUrl(voiceUrl);
+                                    if (voiceBytes != null) {
+                                        saveImageOrRecord(
+                                                BaseUtils.bytesToHexString(audio.getFileMd5()) + ".cqrecord",
+                                                voiceBytes,
+                                                false
+                                        );
+                                    }
+                                });
+                    }
+
+
                 }
             }
             else if (event instanceof NewFriendRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
-                    var session = SessionManager.get(requestEvent.getBot().getId());
+                    val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
             }
             else if (event instanceof MemberJoinRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
-                    var session = SessionManager.get(requestEvent.getBot().getId());
+                    val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
             }
             else if (event instanceof BotInvitedJoinGroupRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
-                    var session = SessionManager.get(requestEvent.getBot().getId());
+                    val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
             }
@@ -147,6 +209,16 @@ public final class OneBotMirai extends JavaPlugin {
 
     private File record(String recordName){
         return new File(this.recordFolder, recordName);
+    }
+
+    public void saveImageOrRecord(String name, String data, boolean img){
+        BaseUtils.safeRun(() -> {
+            if(data != null) {
+                try {
+                    Files.writeString(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.WRITE);
+                } catch (IOException ignored) {}
+            }
+        });
     }
 
     public void saveImageOrRecord(String name, byte[] data, boolean img){

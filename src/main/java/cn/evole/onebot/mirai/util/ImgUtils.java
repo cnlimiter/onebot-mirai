@@ -1,6 +1,7 @@
 package cn.evole.onebot.mirai.util;
 
 import lombok.val;
+import net.mamoe.mirai.message.data.Image;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import static cn.evole.onebot.mirai.OneBotMirai.logger;
 
 public class ImgUtils {
 
-    public static String constructCacheImageMeta(String md5, int size, String url, String imageType){
+    public static String constructCacheImageMeta(String md5, long size, String url, String imageType){
         return """
                 [image]
                 md5=%s
@@ -28,6 +29,17 @@ public class ImgUtils {
                 addtime=%s
                 type=%s
             """.formatted(md5, size, url, System.currentTimeMillis(), imageType);
+    }
+
+
+    public static String getImageType(Image image){
+        val parts = image.getImageId().split("\\.", 2);
+        if (parts.length == 2){
+            return parts[1];
+        }
+        else {
+            return "unknown";
+        }
     }
 
     public static String getImageType(byte[] bytes){
@@ -119,10 +131,12 @@ public class ImgUtils {
                             val bytes = Files.readAllBytes(cacheFile.toPath());
                             byte[] b1 = new byte[16];
                             System.arraycopy(bytes, 0, b1, 0, 16);
-                            md5[0] = BaseUtils.bytesToString(b1);
-                            byte[] b2 = new byte[16];
+                            md5[0] = BaseUtils.bytesToHexString(b1);
+
+                            byte[] b2 = new byte[4];
                             System.arraycopy(bytes, 16, b2, 0, 4);
                             size[0] = BaseUtils.byteToInt(b2);
+
                             url[0] = "https://c2cpicdw.qpic.cn/offpic_new//0/0-00-$md5/0?term=2";
                         }
                         catch (IOException ignored){}

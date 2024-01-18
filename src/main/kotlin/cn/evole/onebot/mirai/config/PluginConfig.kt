@@ -8,11 +8,12 @@ import net.mamoe.mirai.console.data.value
 object PluginConfig : AutoSavePluginConfig("setting"){
     val bots: MutableMap<String, BotConfig>? by value(mutableMapOf("12345654321" to BotConfig()))
     val db by value(DBSettings())
+    val debug : Boolean = false
 
     @Serializable
     data class BotConfig(
-        var cacheImage: Boolean = false,
-        var cacheRecord: Boolean = false,
+        var cacheImage: Boolean = true,
+        var cacheRecord: Boolean = true,
         var heartbeat: HeartbeatConfig = HeartbeatConfig(),
         var http: HTTPConfig = HTTPConfig(),
         @SerialName("ws_reverse")

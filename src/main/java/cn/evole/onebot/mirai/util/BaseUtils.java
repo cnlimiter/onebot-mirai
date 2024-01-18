@@ -71,25 +71,32 @@ public class BaseUtils {
         }
     }
 
-    public static String byteToHex(byte[] bytes){
-        String strHex = "";
-        StringBuilder sb = new StringBuilder();
-        for (int n = bytes.length-1; n >=0; n--) {
-            strHex = Integer.toHexString(bytes[n] & 0xFF);
-            sb.append((strHex.length() == 1) ? "0" + strHex : strHex); // 每个字节由两个字符表示，位数不够，高位补0
+    /**
+     * 更加高效
+     * @param bytes 数据
+     * @return 字符
+     */
+    public static String bytesToHexString(byte[] bytes) {
+        final char[] hexArray = "0123456789ABCDEF".toCharArray();//通过对一个只读数组hexArray进行读取来实现
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-        return sb.toString().trim();
+        return new String(hexChars);
     }
 
     public static String bytesToString(byte[] str) {
         String keyword = null;
         try {
-            keyword = new String(str,"GBK");
+            keyword = new String(str, "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return keyword;
     }
+
 
     public static int byteToInt(byte[] b) {
         int s = 0;
@@ -103,4 +110,6 @@ public class BaseUtils {
         s = s0 | s1 | s2 | s3;
         return s;
     }
+
+
 }
