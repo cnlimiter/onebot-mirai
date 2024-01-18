@@ -32,8 +32,6 @@ dependencies {
     "shadowLink"("org.java-websocket:Java-WebSocket")
     implementation("cn.evole.bot:OneBot-SDK:0.2.7")
     "shadowLink"("cn.evole.bot:OneBot-SDK")
-    implementation("io.github.pcmind:leveldb:1.2")
-    "shadowLink"("io.github.pcmind:leveldb"){transitive = false}
     implementation ("io.github.kongweiguang:KHTTP:0.0.3")
     "shadowLink"("io.github.kongweiguang:KHTTP")
 
