@@ -1,5 +1,6 @@
 package cn.evole.onebot.mirai;
 
+import cn.evole.onebot.mirai.cmd.OneBotMiraiCmd;
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.SessionManager;
 import cn.evole.onebot.mirai.database.NanoDb;
@@ -10,6 +11,7 @@ import cn.evole.onebot.sdk.util.FileUtils;
 import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.Mirai;
+import net.mamoe.mirai.console.command.CommandManager;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
@@ -44,9 +46,10 @@ public final class OneBotMirai extends JavaPlugin {
         VERSION = getDescription().getVersion().toString();
     }
 
-    private final File imageFolder = new File(getDataFolder(), "image");
-    private final File recordFolder = new File(getDataFolder(), "record");
-    public NanoDb<Integer, String> db  = null;
+    public final File imageFolder = new File(getDataFolder(), "image");
+    public final File recordFolder = new File(getDataFolder(), "record");
+    public final File dbFolder = new File(getDataFolder(), "db");
+    public NanoDb<Long, DBUtils.MessageNode> db  = null;
 
     @Override
     public void onEnable() {
@@ -56,10 +59,12 @@ public final class OneBotMirai extends JavaPlugin {
         FileUtils.checkFolder(recordFolder.toPath());
         if (PluginConfig.INSTANCE.getDb().getEnable()) {
             try {
-                db = new NanoDb<>(getDataFolderPath() + "/db.udb");
+                db = new NanoDb<>(dbFolder + "/db.obm");
             } catch (Exception ignored) {
             }
         }
+
+        CommandManager.INSTANCE.registerCommand(OneBotMiraiCmd.INSTANCE, false);
 
         logger.info("Plugin loaded!");
         logger.info("插件当前版本: " + VERSION);

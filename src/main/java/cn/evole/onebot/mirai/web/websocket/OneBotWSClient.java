@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Description:正向websocket服务器
+ * Description:反向websocket服务器
  * Author: cnlimiter
  * Date: 2022/10/14 18:44
  * Version: 1.0
@@ -100,7 +100,7 @@ public class OneBotWSClient extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
-        miraiLogger.warning(String.format("Bot: %d 反向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()), ex);
+        miraiLogger.warning(String.format("Bot: %d 反向Websocket服务端 / 出现错误 \n %s", botSession.getBot().getId(), ex.getMessage()));
     }
 
 
