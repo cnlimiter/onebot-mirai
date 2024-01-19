@@ -1,7 +1,7 @@
 id: cn.evole.mirai.onebot
 main: cn.evole.mirai.onebot.OneBotMirai
-version: 0.2.1
-name: OneBot_Mirai
-author: cnlimiter
+version: ${version}
+name: ${name}
+author: ${author}
 dependencies: [ ]
-info: 基于 [OneBot]标准的mirai 插件版
+info: ${description}

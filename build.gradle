@@ -64,11 +64,24 @@ tasks.withType(JavaCompile).configureEach {
     options.release.set(17)
 }
 
+def resourceTargets = ['plugin.yml']
+def replaceProperties = [
+        name: name, version: version, author: authors, description: description
+]
+
+tasks.withType(ProcessResources).configureEach {
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
+
+    filesMatching(resourceTargets) {
+        expand replaceProperties + [project: project]
+    }
+}
+
 publishing {
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
-
 
             version = "${project.version}"
             artifactId = "${project.archives_base_name}"

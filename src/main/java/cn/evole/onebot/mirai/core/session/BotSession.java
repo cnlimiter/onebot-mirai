@@ -1,5 +1,6 @@
 package cn.evole.onebot.mirai.core.session;
 
+import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.config.PluginConfig.BotConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
@@ -93,10 +94,10 @@ public class BotSession {
         this.websocketClient.forEach(OneBotWSClient::close);
     }
 
-    //private ThreadLocal<Gson> gsonTl = new ThreadLocal<Gson>();
+    private final ThreadLocal<Gson> gsonTl = new ThreadLocal<Gson>();
     public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event);
-        var json = GsonUtils.getGson().toJson(e);
+        var json = gsonTl.get().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
             var debug = PluginConfig.INSTANCE.getDebug();
 
@@ -104,9 +105,9 @@ public class BotSession {
             if (this.botConfig.getHttp().getEnable()){
                 if (debug) this.miraiLogger.info("将上报http事件");
                 Properties header = new Properties();
-                header.putIfAbsent("User-Agent", "CQHttp/4.15.0");
+                header.putIfAbsent("User-Agent", "OneBotMirai/"+ OneBotMirai.VERSION);
                 header.putIfAbsent("X-Self-ID", bot.getId());
-                if (!botConfig.getHttp().getSecret().isEmpty()) header.putIfAbsent("X-Signature", BaseUtils.getSha(json, "SHA-1", false));
+                if (!botConfig.getHttp().getSecret().isEmpty()) header.putIfAbsent("X-Signature", BaseUtils.getSha(json, botConfig.getHttp().getSecret(),"SHA-1", false));
                 var response = HttpUtils.jsonPost(this.miraiLogger, this.botConfig.getHttp().getPostUrl(), json, header);
                 if (response != null){
                     if (debug) this.miraiLogger.info("收到上报响应 %s".formatted(response));

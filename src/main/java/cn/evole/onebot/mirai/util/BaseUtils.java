@@ -115,9 +115,9 @@ public class BaseUtils {
     }
 
 
-    public static String getSha(String plainText, String algorithm, boolean uppercase) {
+    public static String getSha(String plainText, String secret, String algorithm, boolean uppercase) {
         //输入的字符串转换成字节数组
-        byte[] bytes = plainText.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = (plainText + secret).getBytes(StandardCharsets.UTF_8);
         MessageDigest messageDigest;
         try {
             //获得SHA转换器
