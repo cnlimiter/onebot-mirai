@@ -8,6 +8,9 @@ import lombok.val;
 import net.mamoe.mirai.event.events.MessageEvent;
 import net.mamoe.mirai.message.data.MessageChain;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * @Project: onebot-mirai
  * @Author: cnlimiter
@@ -16,7 +19,9 @@ import net.mamoe.mirai.message.data.MessageChain;
  */
 
 public class DBUtils {
-    public static class MessageNode {
+    public static class MessageNode implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 114514114514L;
         long contactId;
         int messageId;
         String content;
