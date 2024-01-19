@@ -43,7 +43,6 @@ public class BotSession {
     private final OneBotWSServer websocketServer;
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
     private final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE.create(BotSession.class);
-    private Mac sha1Util = null;
 
 
     @Override
@@ -68,11 +67,11 @@ public class BotSession {
 
 
         if (this.botConfig.getHttp().getEnable()){
-            this.miraiLogger.info(String.format("创建正向HTTP服务器：%s, %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+            this.miraiLogger.info(String.format("创建正向HTTP服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
             this.httpServer.create();
         }
         if (this.botConfig.getWs().getEnable()){
-            this.miraiLogger.info(String.format("创建正向WS服务器：%s, %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+            this.miraiLogger.info(String.format("创建正向WS服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
             this.websocketServer.create();
         }
 
@@ -82,7 +81,7 @@ public class BotSession {
                         this, ws_re
                 );
                 client.create();
-                this.miraiLogger.info(String.format("创建反向WS服务器：%s, %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+                this.miraiLogger.info(String.format("创建反向WS服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
                 this.websocketClient.add(client);
             }
         }
@@ -97,6 +96,7 @@ public class BotSession {
     private final ThreadLocal<Gson> gsonTl = new ThreadLocal<Gson>();
     public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event);
+        gsonTl.set(GsonUtils.getGson());
         var json = gsonTl.get().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
             var debug = PluginConfig.INSTANCE.getDebug();

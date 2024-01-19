@@ -115,10 +115,12 @@ public final class OneBotMirai extends JavaPlugin {
                     if (messageEvent instanceof GroupMessageEvent groupMessageEvent){
                         session.getApiImpl().getCachedSourceQueue().add(groupMessageEvent.getSource());
                     }
-                    else if (messageEvent instanceof GroupTempMessageEvent groupTempMessageEvent){
+
+                    if (messageEvent instanceof GroupTempMessageEvent groupTempMessageEvent){
                         session.getApiImpl().getCachedTempContact()
                                 .put(groupTempMessageEvent.getSender().getId(), groupTempMessageEvent.getGroup().getId());
                     }
+
                     if (session.getBotConfig().getCacheImage()){
                         messageEvent.getMessage().stream()
                                 .filter(singleMessage -> singleMessage instanceof Image)
@@ -213,7 +215,7 @@ public final class OneBotMirai extends JavaPlugin {
         BaseUtils.safeRun(() -> {
             if(data != null) {
                 try {
-                    Files.writeString(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.WRITE);
+                    Files.writeString(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.CREATE_NEW);
                 } catch (IOException ignored) {}
             }
         });
@@ -223,7 +225,7 @@ public final class OneBotMirai extends JavaPlugin {
         BaseUtils.safeRun(() -> {
             if(data != null) {
                 try {
-                    Files.write(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.WRITE);
+                    Files.write(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.CREATE_NEW);
                 } catch (IOException ignored) {}
             }
         });

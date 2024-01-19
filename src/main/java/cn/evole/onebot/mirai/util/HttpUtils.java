@@ -11,7 +11,6 @@ import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static cn.evole.onebot.mirai.util.StringUtils.isEmpty;
 
 
 /**
@@ -106,7 +105,7 @@ public class HttpUtils {
     public static void downloadFile(String urlStr, String fileName) {
         EXECUTOR_SERVICE.execute(() -> {
             try {
-                if (isEmpty(urlStr) || isEmpty(fileName)) return;
+                if (urlStr.isEmpty() || fileName.isEmpty()) return;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 startDownload(urlStr, baos);
                 File file = new File(fileName);
@@ -130,7 +129,7 @@ public class HttpUtils {
     public static void downloadFile(String urlStr, File file) {
         EXECUTOR_SERVICE.execute(() -> {
             try {
-                if (file == null || isEmpty(urlStr)) return;
+                if (file == null || urlStr.isEmpty()) return;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 startDownload(urlStr, baos);
                 file.getParentFile().mkdirs();

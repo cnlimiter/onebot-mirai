@@ -71,7 +71,7 @@ public class OneBotWSClient extends WebSocketClient {
         try {
             this.close(0);
         } catch (Exception e){
-            miraiLogger.error(String.format("出现错误:\n %s", e));
+            miraiLogger.error(String.format("出现错误:\n %s", e.getMessage()));
         }
     }
 
