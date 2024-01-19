@@ -20,8 +20,8 @@ public class DBUtils {
             val messageId = DataBaseUtils.toMessageId(event.getSource().getInternalIds(), event.getBot().getId(), event.getSource().getFromId());
             if (OneBotMirai.INSTANCE.db!=null){
                 OneBotMirai.INSTANCE.db.set(
-                        DataBaseUtils.toByteArray(messageId),
-                        MessageChain.serializeToJsonString(event.getMessage()).getBytes());
+                        messageId,
+                        MessageChain.serializeToJsonString(event.getMessage()));
             }
         }
     }

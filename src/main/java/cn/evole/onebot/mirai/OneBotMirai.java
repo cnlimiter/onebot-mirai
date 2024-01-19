@@ -46,7 +46,7 @@ public final class OneBotMirai extends JavaPlugin {
 
     private final File imageFolder = new File(getDataFolder(), "image");
     private final File recordFolder = new File(getDataFolder(), "record");
-    public NanoDb<byte[], byte[]> db  = null;
+    public NanoDb<Integer, String> db  = null;
 
     @Override
     public void onEnable() {
