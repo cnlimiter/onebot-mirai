@@ -201,7 +201,7 @@ public final class OneBotMirai extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.db.save();
+        db.save();
         initialSubscription.complete();
         SessionManager.getSessions().forEach((aLong, botSession) -> SessionManager.closeSession(aLong));
         logger.info("OneBot Stopped!");

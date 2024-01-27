@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @Project: onebot-mirai
  * @Author: cnlimiter
  * @CreateTime: 2024/1/19 0:44
- * @Description:
+ * @Description: 高性能、微型、伪数据库
  */
 
 @SuppressWarnings({"unused", "BusyWait", "ResultOfMethodCallIgnored"})

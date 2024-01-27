@@ -17,7 +17,7 @@ public class SessionManager{
 
 
     @Getter
-    private static final LinkedHashMap<Long, BotSession> sessions = new LinkedHashMap<>();//一个机器人对应一个websocket连接
+    private static final LinkedHashMap<Long, BotSession> sessions = new LinkedHashMap<>();//一个机器人对应一个session
 
     public static BotSession get(long botId){
         return sessions.get(botId);

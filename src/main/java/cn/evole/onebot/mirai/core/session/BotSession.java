@@ -42,7 +42,7 @@ public class BotSession {
     private final OneBotHttpServer httpServer;
     private final OneBotWSServer websocketServer;
     private final List<OneBotWSClient> websocketClient = new ArrayList<>();
-    private final MiraiLogger miraiLogger = MiraiLogger.Factory.INSTANCE.create(BotSession.class);
+    private final MiraiLogger miraiLogger = OneBotMirai.logger;
 
 
     @Override
@@ -67,11 +67,11 @@ public class BotSession {
 
 
         if (this.botConfig.getHttp().getEnable()){
-            this.miraiLogger.info(String.format("创建正向HTTP服务器: %s: %s", botConfig.getHttp().getHost(), botConfig.getHttp().getPort()));
+            this.miraiLogger.info(String.format("创建正向HTTP服务器: %s:%s", botConfig.getHttp().getHost(), botConfig.getHttp().getPort()));
             this.httpServer.create();
         }
         if (this.botConfig.getWs().getEnable()){
-            this.miraiLogger.info(String.format("创建正向WS服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+            this.miraiLogger.info(String.format("创建正向WS服务器: %s:%s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
             this.websocketServer.create();
         }
 
@@ -81,7 +81,7 @@ public class BotSession {
                         this, ws_re
                 );
                 client.create();
-                this.miraiLogger.info(String.format("创建反向WS服务器: %s: %s", ws_re.getReverseHost(), ws_re.getReversePort()));
+                this.miraiLogger.info(String.format("创建反向WS服务器: %s:%s", ws_re.getReverseHost(), ws_re.getReversePort()));
                 this.websocketClient.add(client);
             }
         }
@@ -93,37 +93,35 @@ public class BotSession {
         this.websocketClient.forEach(OneBotWSClient::close);
     }
 
-    private final ThreadLocal<Gson> gsonTl = new ThreadLocal<Gson>();
+    private final ThreadLocal<Gson> gsonTl = ThreadLocal.withInitial(GsonUtils::getGson);
     public void triggerEvent(BotEvent event){
         var e = EventMap.toDTO(event);
-        gsonTl.set(GsonUtils.getGson());
         var json = gsonTl.get().toJson(e);
         if (!(e instanceof IgnoreEvent)) {
             var debug = PluginConfig.INSTANCE.getDebug();
-
-
             if (this.botConfig.getHttp().getEnable()){
-                if (debug) this.miraiLogger.info("将上报http事件");
+                if (debug) this.miraiLogger.info("上报HTTP事件");
                 Properties header = new Properties();
                 header.putIfAbsent("User-Agent", "OneBotMirai/"+ OneBotMirai.VERSION);
                 header.putIfAbsent("X-Self-ID", bot.getId());
                 if (!botConfig.getHttp().getSecret().isEmpty()) header.putIfAbsent("X-Signature", BaseUtils.getSha(json, botConfig.getHttp().getSecret(),"SHA-1", false));
                 var response = HttpUtils.jsonPost(this.miraiLogger, this.botConfig.getHttp().getPostUrl(), json, header);
                 if (response != null){
-                    if (debug) this.miraiLogger.info("收到上报响应 %s".formatted(response));
+                    if (debug) this.miraiLogger.info("收到HTTP上报响应 %s".formatted(response));
                     try {
                         var respJson = new JsonsObject(response);
                         var sentJson = new JsonsObject(json);
+                        //todo 快速操作
                         //var params = hashMapOf("context" to sentJson, "operation" to respJson)
                         //miraiApi.handleQuickOperation(params)
                     } catch (Exception e1) {
-                        this.miraiLogger.error("解析HTTP上报返回数据成json失败");
+                        this.miraiLogger.error("解析HTTP上报返回数据失败");
                     }
                 }
             }
 
             if (this.botConfig.getWs().getEnable()){
-                if (debug) this.miraiLogger.info("将广播正向websocket事件");
+                if (debug) this.miraiLogger.info("广播正向websocket事件");
                 this.websocketServer.broadcast(json);
             }
 
@@ -135,11 +133,11 @@ public class BotSession {
                                 client.send(json);
                             }
                         }catch (Exception ex){
-                            this.miraiLogger.warning("error sending msg", ex);
+                            this.miraiLogger.warning("广播反向websocket事件失败:", ex);
                         }
                         return client.isOpen();
                     }).count();
-                    if (debug)  this.miraiLogger.info(String.format("将广播反向websocket事件, 共计发送 :%d", sendCount));
+                    if (debug)  this.miraiLogger.info(String.format("广播反向websocket事件, 共发送 :%d", sendCount));
                 }
             }
 
