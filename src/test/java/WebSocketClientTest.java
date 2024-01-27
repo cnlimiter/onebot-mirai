@@ -1,7 +1,6 @@
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.BotSession;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
-import cn.evole.onebot.sdk.action.ActionData;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.java_websocket.server.WebSocketServer;
@@ -23,7 +22,7 @@ public class WebSocketClientTest{
 
     @BeforeAll
     public static void construct(){
-        simpleServer = new SimpleWsEchoServer(new InetSocketAddress(2342));
+        simpleServer = new SimpleWsEchoServer(new InetSocketAddress(8888));
         simpleServer.start();
     }
 
@@ -36,7 +35,7 @@ public class WebSocketClientTest{
         Mockito.when(bot.getLogger()).thenReturn(MiraiLogger.Factory.INSTANCE.create(this.getClass()));
         PluginConfig.WSReverseConfig reverseConfig = new PluginConfig.WSReverseConfig();
         reverseConfig.setReverseHost("localhost");
-        reverseConfig.setReversePort(2342);
+        reverseConfig.setReversePort(8888);
         reverseConfig.setUseUniversal(true);
         reverseConfig.setAccessToken("testToken");
 

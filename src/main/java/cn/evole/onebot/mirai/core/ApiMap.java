@@ -19,7 +19,6 @@ import cn.evole.onebot.mirai.web.queue.CacheRequestQueue;
 import cn.evole.onebot.mirai.web.queue.CacheSourceQueue;
 import cn.evole.onebot.sdk.response.misc.RecordInfoResp;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.val;
@@ -316,29 +315,26 @@ public class ApiMap {
     public ActionData<?> sendGroupMessage(JsonObject params) {
         val targetGroupId = params.get("group_id").getAsLong();
         val raw = params.has("auto_escape") && params.get("auto_escape").getAsBoolean();
-        val messages = params.get("message").getAsJsonArray();
+        val messages = params.get("message");
 
-        MessageSuccess r = new MessageSuccess(-1);;
-
-        for (JsonElement message : messages.asList()) {
-            val group = bot.getGroupOrFail(targetGroupId);
-            val messageChain = OnebotMsgUtils.messageToMiraiMessageChains(bot, group, message, raw);
-            if (messageChain != null && !messageChain.contentToString().isEmpty()) {
-                val receipt = group.sendMessage(messageChain);
-                cachedSourceQueue.add(receipt.getSource());
-                r = new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
-            }
+        val group = bot.getGroupOrFail(targetGroupId);
+        val messageChain = OnebotMsgUtils.messageToChains(bot, group, messages, raw);
+        if (messageChain != null && !messageChain.contentToString().isEmpty()) {
+            val receipt = group.sendMessage(messageChain);
+            cachedSourceQueue.add(receipt.getSource());
+            return new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
         }
-        return r;
+        else {
+            return new MessageSuccess(-1);
+        }
     }
 
     public ActionData<?> sendPrivateMessage(JsonObject params) {
         val targetQQId = params.get("user_id").getAsLong();
         val raw = params.has("auto_escape") || params.get("auto_escape").getAsBoolean();
         val messages = params.get("message");
+
         Contact contact;
-
-
         try {
             contact = bot.getFriendOrFail(targetQQId);
         } catch (NoSuchElementException e) {
@@ -346,7 +342,7 @@ public class ApiMap {
             //?: bot.groups.find { group -> group.members.contains(targetQQId) }?.id
             contact = bot.getGroupOrFail(fromGroupId).getOrFail(targetQQId);
         }
-        val messageChain = OnebotMsgUtils.messageToMiraiMessageChains(bot, contact, messages, raw);
+        val messageChain = OnebotMsgUtils.messageToChains(bot, contact, messages, raw);
         if (messageChain != null && !messageChain.contentToString().isEmpty()) {
             val receipt = contact.sendMessage(messageChain);
             cachedSourceQueue.add(receipt.getSource());

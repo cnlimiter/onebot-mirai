@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.java-websocket:Java-WebSocket:1.5.3")
+    implementation("org.java-websocket:Java-WebSocket:1.5.5")
     "shadowLink"("org.java-websocket:Java-WebSocket")
     implementation("cn.evole.bot:OneBot-SDK:0.2.7")
     "shadowLink"("cn.evole.bot:OneBot-SDK")
@@ -39,9 +39,9 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.24"
 
     annotationProcessor "org.projectlombok:lombok:1.18.24"
-    annotationProcessor "org.java-websocket:Java-WebSocket:1.5.3"
+    annotationProcessor "org.java-websocket:Java-WebSocket:1.5.5"
 
-    testImplementation("ch.qos.logback:logback-classic:1.2.11")
+    testImplementation('ch.qos.logback:logback-classic:1.4.12')
     testImplementation("org.slf4j:slf4j-simple:2.0.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("org.mockito:mockito-core:5.4.0")
@@ -71,10 +71,9 @@ def replaceProperties = [
 
 tasks.withType(ProcessResources).configureEach {
     inputs.properties replaceProperties
-    replaceProperties.put 'project', project
 
     filesMatching(resourceTargets) {
-        expand replaceProperties + [project: project]
+        expand replaceProperties
     }
 }
 

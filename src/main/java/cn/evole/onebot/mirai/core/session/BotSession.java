@@ -67,7 +67,7 @@ public class BotSession {
 
 
         if (this.botConfig.getHttp().getEnable()){
-            this.miraiLogger.info(String.format("创建正向HTTP服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+            this.miraiLogger.info(String.format("创建正向HTTP服务器: %s: %s", botConfig.getHttp().getHost(), botConfig.getHttp().getPort()));
             this.httpServer.create();
         }
         if (this.botConfig.getWs().getEnable()){
@@ -81,7 +81,7 @@ public class BotSession {
                         this, ws_re
                 );
                 client.create();
-                this.miraiLogger.info(String.format("创建反向WS服务器: %s: %s", botConfig.getWs().getWsHost(), botConfig.getWs().getWsPort()));
+                this.miraiLogger.info(String.format("创建反向WS服务器: %s: %s", ws_re.getReverseHost(), ws_re.getReversePort()));
                 this.websocketClient.add(client);
             }
         }

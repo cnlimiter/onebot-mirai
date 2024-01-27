@@ -3,11 +3,9 @@ package cn.evole.onebot.mirai.util;
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import kotlin.NotImplementedError;
-import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
@@ -35,13 +33,14 @@ public class OnebotMsgUtils {
 
     private static final PlainText MSG_EMPTY = new PlainText("");
 
-    public static MessageChain messageToMiraiMessageChains(Bot bot, Contact contact, Object message, boolean raw){
-        if (message instanceof String s){
-            return raw ? new MessageChainBuilder().append(new PlainText(s)).build():
-                    codeToChain(bot, s, contact)
+    public static MessageChain messageToChains(Bot bot, Contact contact, JsonElement message, boolean escape){
+        if (message.isJsonPrimitive() && message.getAsJsonPrimitive().isString()){
+            return escape ? new MessageChainBuilder().append(new PlainText(message.getAsString())).build():
+                    codeToChain(bot, message.getAsString(), contact)
                     ;
         }
-        else if (message instanceof JsonObject jsonObject) {
+        else if (message.isJsonObject()) {
+            var jsonObject = message.getAsJsonObject();
             var messageChain = new MessageChainBuilder();
             try {
                 var data = jsonObject.getAsJsonObject("data");
@@ -56,7 +55,8 @@ public class OnebotMsgUtils {
             }
             return messageChain.build();
         }
-        else if (message instanceof JsonArray jsonArray) {
+        else if (message.isJsonArray()) {
+            var jsonArray = message.getAsJsonArray();
             var messageChain = new MessageChainBuilder();
             for (var msg : jsonArray){
                 try {
@@ -67,14 +67,10 @@ public class OnebotMsgUtils {
                         else messageChain.append(textToMessageInternal(bot, contact, message));
                     }
                 } catch (NullPointerException e) {
-                    logger.warning("Got null when parsing CQ message object");
+                    logger.warning("Got null when parsing Chain message object");
                 }
             }
             return messageChain.build();
-        }
-        else if (message instanceof JsonPrimitive jsonPrimitive) {
-            return raw ? new MessageChainBuilder().append(new PlainText(jsonPrimitive.getAsString())).build():
-                    codeToChain(bot, jsonPrimitive.getAsString(), contact);
         }
         else {
             logger.warning("Cannot determine type of " + message.toString());
@@ -164,8 +160,14 @@ public class OnebotMsgUtils {
         } else {
           text = new PlainText(unescape(message));
         }
-        return new MessageChainBuilder()
+        return msg.get() != null
+                ?
+                new MessageChainBuilder()
                 .append(msg.get())
+                .append(text)
+                .build()
+                :
+                new MessageChainBuilder()
                 .append(text)
                 .build();
     }
@@ -251,7 +253,7 @@ public class OnebotMsgUtils {
             }
             case "image" -> {
                 String file = args.get("file");
-                Message message = constuctImageMsg(file, contact);
+                Message message = constructImageMsg(file, contact);
                 logger.info(String.format("Image: %s", message));
                 return message;
             }
@@ -320,7 +322,7 @@ public class OnebotMsgUtils {
 
     }
 
-    private static Message constuctImageMsg(String fileStr, Contact contact) {
+    private static Message constructImageMsg(String fileStr, Contact contact) {
         int index = fileStr.indexOf(":");
         String protocol;
         String content;
@@ -343,10 +345,8 @@ public class OnebotMsgUtils {
                 byte[] decode = Base64.getDecoder().decode(content);
 
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
-                Image image = null;
                 try {
-                    image = ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, ImageType.PNG.getFormatName()).toAutoCloseable(), contact);
-                    return image;
+                    return ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, ImageType.PNG.getFormatName()).toAutoCloseable(), contact);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
