@@ -66,7 +66,7 @@ public final class OneBotMirai extends JavaPlugin {
 
         CommandManager.INSTANCE.registerCommand(OneBotMiraiCmd.INSTANCE, false);
 
-        logger.info("Plugin loaded!");
+        logger.info("OneBot Loaded!");
         logger.info("插件当前版本: " + VERSION);
         logger.info("开发交流群: 720975019");
 
@@ -75,20 +75,20 @@ public final class OneBotMirai extends JavaPlugin {
         List<Bot> instances = Bot.getInstances();
         logger.info(String.format("当前存在的机器人数量: %d", instances.size()));
         instances.forEach(bot -> {
-            logger.info(String.format("bot : %d", bot.getId()));
+            logger.info(String.format("Bot : %s 开始创建", bot.getId()));
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
                 val botId = String.valueOf(bot.getId());
                 if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
                     val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                     SessionManager.createBotSession(bot, mapConfig);
-                        logger.info(String.format("创建配置: %d", bot.getId()));
+                        logger.info(String.format("Bot: %s 创建Session", bot.getId()));
                 }
                 else {
-                    logger.debug(String.format("%s 未进行OneBot配置,请在setting.yml中进行配置", bot.getId()));
+                    logger.debug(String.format("Bot: %s 未进行OneBot配置,请在setting.yml中进行配置", bot.getId()));
                 }
             }
             else {
-                logger.debug(String.format("%s 已经存在", bot.getId()));
+                logger.debug(String.format("Bot: %s 已经存在", bot.getId()));
             }
         });
 
@@ -102,11 +102,11 @@ public final class OneBotMirai extends JavaPlugin {
                     if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
                         val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                         val session = SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
-                        logger.info(String.format("机器人 %s 创建 OneBot Session", event.getBot().getId()));
+                        logger.info(String.format("Bot: %s 创建Session", event.getBot().getId()));
                         if (PluginConfig.INSTANCE.getDebug()) logger.info("OneBot Session: " + session);
                     }
                     else {
-                        logger.warning(String.format("机器人 %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
+                        logger.warning(String.format("Bot: %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
                     }
                 }
 
@@ -204,7 +204,7 @@ public final class OneBotMirai extends JavaPlugin {
         this.db.save();
         initialSubscription.complete();
         SessionManager.getSessions().forEach((aLong, botSession) -> SessionManager.closeSession(aLong));
-        logger.info("OneBot 已关闭");
+        logger.info("OneBot Stopped!");
     }
 
 

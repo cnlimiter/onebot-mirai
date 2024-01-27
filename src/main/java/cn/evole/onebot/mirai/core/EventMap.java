@@ -1,6 +1,7 @@
 package cn.evole.onebot.mirai.core;
 
 import cn.evole.onebot.mirai.OneBotMirai;
+import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.model.MiraiClients;
 import cn.evole.onebot.mirai.util.TransformUtils;
 import cn.evole.onebot.sdk.event.Event;
@@ -327,7 +328,7 @@ public class EventMap {
                 return event;
             }
             else {
-                logger.info(String.format("发生讨论组消息撤回事件, 已被插件忽略: %s", recallEvent));
+                if (PluginConfig.INSTANCE.getDebug()) logger.info(String.format("发生讨论组消息撤回事件, 已被插件忽略: %s", recallEvent));
                 return new IgnoreEvent(recallEvent.getBot().getId());
             }
         }
@@ -388,7 +389,7 @@ public class EventMap {
             logger.info("即将上传图片");
             return new IgnoreEvent(botEvent.getBot().getId());
         } else {
-            logger.info(String.format("发生了被插件忽略的事件: %s", botEvent));
+            if (PluginConfig.INSTANCE.getDebug()) logger.info(String.format("发生了被插件忽略的事件: %s", botEvent));
             return new IgnoreEvent(botEvent.getBot().getId());
         }
     }
