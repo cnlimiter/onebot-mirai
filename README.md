@@ -131,31 +131,31 @@ _✨ 对接[OneBot](https://github.com/howmanybots/onebot/blob/master/README.md)
 
 ## 项目引用
 - [OneBot标准](https://github.com/howmanybots/onebot)  
-- [onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)  -  [LICENSE](https://github.com/yyuueexxiinngg/onebot-kotlin/blob/dev/LICENSE)  
-- [mirai-api-http](https://github.com/mamoe/mirai-api-http) -  [LICENSE](https://github.com/mamoe/mirai-api-http/blob/master/LICENSE)  
-- [Mirai Native](https://github.com/iTXTech/mirai-native)  -  [LICENSE](https://github.com/iTXTech/mirai-native/blob/master/LICENSE)  
+- [onebot-kotlin](https://github.com/yyuueexxiinngg/onebot-kotlin)  -  [LICENSE](https://github.com/yyuueexxiinngg/onebot-kotlin/blob/dev/LICENSE)
 - [CQHTTP](https://github.com/richardchien/coolq-http-api) -  [LICENSE](https://github.com/richardchien/coolq-http-api/blob/master/LICENSE)
 - [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)  -  [LICENSE](https://github.com/Mrs4s/go-cqhttp/blob/master/LICENSE)
+- [onebot-sdk](https://github.com/cnlimiter/onebot-sdk)  -  [LICENSE](https://github.com/cnlimiter/onebot-sdk/blob/master/LICENSE)
 
 ## 友情链接
 兼容 [OneBot-v11 ](https://github.com/howmanybots/onebot)标准的一些项目🥰  
 
-| 项目地址                                                                      | 核心作者           | 备注                  |
-|---------------------------------------------------------------------------|----------------|---------------------|
-| [MrXiaoM/Overflow](https://github.com/MrXiaoM/Overflow)                   | MrXiaoM        | 实现 mirai 的无缝迁移      |
-| [LagrangeDev/Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) | NepPure        | C#实现 By Konata.Core |
-| [whitechi73/OpenShamrock](https://github.com/whitechi73/OpenShamrock)     | whitechi73     | Xposed框架hook实现      |
-| [Hoshinonyaruko/Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo)     | Hoshinonyaruko | 基于官方api 轻量 原生跨平台    |
+| 项目地址                                                                              | 核心作者           | 备注                                                                   |
+|-----------------------------------------------------------------------------------|----------------|----------------------------------------------------------------------|
+| [Overflow](https://github.com/MrXiaoM/Overflow)                                   | MrXiaoM        | 实现 mirai 的无缝迁移                                                       |
+| [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)                     | NepPure        | C#实现 By Konata.Core                                                  |
+| [OpenShamrock](https://github.com/whitechi73/OpenShamrock)                        | whitechi73     | Xposed框架hook实现                                                       |
+| [Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo)                            | Hoshinonyaruko | 基于官方api 轻量 原生跨平台                                                     |
+| [LiteLoaderQQNT-OneBotApi](https://github.com/linyuchen/LiteLoaderQQNT-OneBotApi) | linyuchen      | 使用[LiteLoaderQQNT](https://github.com/LiteLoaderQQNT/LiteLoaderQQNT) |
 
 
 
 ## 鸣谢
 
 > [IntelliJ IDEA](https://zh.wikipedia.org/zh-hans/IntelliJ_IDEA) 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。  
-[<img src="https://mikuac.com/images/jetbrains-variant-3.png" width="200"/>](https://www.jetbrains.com/?from=mirai)
+[<img src="https://mikuac.com/images/jetbrains-variant-3.png" width="150"/>](https://www.jetbrains.com/?from=onebot-mirai)
 
 
 
 ## 统计
-> 觉得不错给个star吧~  (～￣▽￣)～
+> 觉得不错给个star吧~  (～￣▽￣)～  
  [![Stargazers over time](https://starchart.cc/cnlimiter/onebot-mirai.svg)](https://starchart.cc/cnlimiter/onebot-mirai)
