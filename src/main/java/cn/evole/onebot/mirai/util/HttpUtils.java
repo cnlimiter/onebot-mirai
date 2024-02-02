@@ -63,14 +63,13 @@ public class HttpUtils {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
             StringBuilder sb = new StringBuilder();
-            String line = "";
+            String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\n");
             }
             return sb.toString();
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            return "";
         }
     }
 

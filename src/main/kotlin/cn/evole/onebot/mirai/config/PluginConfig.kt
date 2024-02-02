@@ -39,7 +39,7 @@ object PluginConfig : AutoSavePluginConfig("setting"){
         var host: String = "0.0.0.0",
         var port: Int = 6700,
         var accessToken: String = "",
-        var postUrl: String = "",
+        var postUrl: String = "http://0.0.0.0:6700/event",
         var postMessageFormat: String = "string",
         var secret: String = "",
         var timeout: Long = 0L

@@ -6,23 +6,18 @@ import cn.evole.onebot.mirai.config.PluginConfig.BotConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
 import cn.evole.onebot.mirai.core.EventMap;
 import cn.evole.onebot.mirai.util.BaseUtils;
-import cn.evole.onebot.mirai.util.GsonUtils;
 import cn.evole.onebot.mirai.util.HttpUtils;
 import cn.evole.onebot.mirai.web.http.OneBotHttpServer;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSClient;
 import cn.evole.onebot.mirai.web.websocket.OneBotWSServer;
 import cn.evole.onebot.sdk.event.IgnoreEvent;
-import cn.evole.onebot.sdk.util.json.JsonsObject;
+import cn.evole.onebot.sdk.util.json.GsonUtils;
 import com.google.gson.Gson;
 import lombok.Getter;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.events.BotEvent;
 import net.mamoe.mirai.utils.MiraiLogger;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -104,13 +99,12 @@ public class BotSession {
                 Properties header = new Properties();
                 header.putIfAbsent("User-Agent", "OneBotMirai/"+ OneBotMirai.VERSION);
                 header.putIfAbsent("X-Self-ID", bot.getId());
-                if (!botConfig.getHttp().getSecret().isEmpty()) header.putIfAbsent("X-Signature", BaseUtils.getSha(json, botConfig.getHttp().getSecret(),"SHA-1", false));
+                if (!botConfig.getHttp().getSecret().isEmpty())
+                    header.putIfAbsent("X-Signature", BaseUtils.getSha(json, botConfig.getHttp().getSecret(),"SHA-1", false));
                 var response = HttpUtils.jsonPost(this.miraiLogger, this.botConfig.getHttp().getPostUrl(), json, header);
                 if (response != null){
                     if (debug) this.miraiLogger.info("收到HTTP上报响应 %s".formatted(response));
                     try {
-                        var respJson = new JsonsObject(response);
-                        var sentJson = new JsonsObject(json);
                         //todo 快速操作
                         //var params = hashMapOf("context" to sentJson, "operation" to respJson)
                         //miraiApi.handleQuickOperation(params)

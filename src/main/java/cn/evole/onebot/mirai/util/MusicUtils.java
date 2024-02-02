@@ -1,6 +1,6 @@
 package cn.evole.onebot.mirai.util;
 
-import cn.evole.onebot.sdk.util.json.JsonsObject;
+import cn.evole.onebot.sdk.util.json.GsonUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.val;
@@ -24,9 +24,9 @@ public class MusicUtils {
                     "https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?&jsonpCallback=MusicJsonCallback&cid=205361747&songmid=" +
                             mid + "&filename=C400" + mid + ".m4a&guid=7549058080"
             );
-            JsonsObject jsonObject = new JsonsObject(result);
+            JsonObject jsonObject = GsonUtils.parse(result);
             val json =
-                    jsonObject.getJsonElement("data").getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject();
+                    GsonUtils.getNonNull(jsonObject, "data").getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject();
             if (json.has("subcode")) {
                 return "http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com/C400$mid.m4a?guid=7549058080&amp;vkey=%s&amp;uin=0&amp;fromtag=38".formatted(json.get("vkey").getAsString());
             }
@@ -40,8 +40,8 @@ public class MusicUtils {
                             "{%22comm%22:{%22ct%22:24,%22cv%22:0},%22songinfo%22:{%22method%22:%22get_song_detail_yqq%22,%22param%22:" +
                             "{%22song_type%22:0,%22song_mid%22:%22"+mid+"%22,%22song_id%22:"+id+"},%22module%22:%22music.pf_song_detail_svr%22}}"
             );
-            JsonsObject jsonObject = new JsonsObject(result);
-            return jsonObject.getJsonElement("songinfo").getAsJsonObject().get("data").getAsJsonObject();
+            JsonObject jsonObject = GsonUtils.parse(result);
+            return GsonUtils.getNonNull(jsonObject, "songinfo").getAsJsonObject().get("data").getAsJsonObject();
 
         }
         public static Message send(String id) {
@@ -77,8 +77,8 @@ public class MusicUtils {
     public static class NeteaseMusic{
         public static JsonObject getSongInfo(String id) {
             val result = HttpUtils.getStringFromHttpUrl("http://music.163.com/api/song/detail/?id="+id+"&ids=%5B"+id+"%5D");
-            JsonsObject jsonObject = new JsonsObject(result);
-            return jsonObject.getJsonElement("songs").getAsJsonArray().get(0).getAsJsonObject();
+            JsonObject jsonObject = GsonUtils.parse(result);
+            return GsonUtils.getNonNull(jsonObject, "songs").getAsJsonArray().get(0).getAsJsonObject();
         }
 
         public static ServiceMessage toXmlMessage(String song, String  singer, String  songId, String  coverUrl){

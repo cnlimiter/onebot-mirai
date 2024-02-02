@@ -30,7 +30,7 @@ repositories {
 dependencies {
     implementation("org.java-websocket:Java-WebSocket:1.5.5")
     "shadowLink"("org.java-websocket:Java-WebSocket")
-    implementation("cn.evole.bot:OneBot-SDK:0.2.7")
+    implementation("cn.evole.bot:OneBot-SDK:0.2.8")
     "shadowLink"("cn.evole.bot:OneBot-SDK")
     implementation ("io.github.kongweiguang:KHTTP:0.0.3")
     "shadowLink"("io.github.kongweiguang:KHTTP")

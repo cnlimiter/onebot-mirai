@@ -3,6 +3,7 @@ package cn.evole.onebot.mirai.util;
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.ApiMap;
+import cn.evole.onebot.sdk.util.json.GsonUtils;
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
