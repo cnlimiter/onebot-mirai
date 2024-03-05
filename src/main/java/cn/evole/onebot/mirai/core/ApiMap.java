@@ -331,7 +331,7 @@ public class ApiMap {
 
     public ActionData<?> sendPrivateMessage(JsonObject params) {
         val targetQQId = params.get("user_id").getAsLong();
-        val raw = params.has("auto_escape") || params.get("auto_escape").getAsBoolean();
+        val raw = params.has("auto_escape") && params.get("auto_escape").getAsBoolean();
         val messages = params.get("message");
 
         Contact contact;
