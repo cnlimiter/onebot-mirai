@@ -19,6 +19,8 @@ import cn.evole.onebot.mirai.web.queue.CacheRequestQueue;
 import cn.evole.onebot.mirai.web.queue.CacheSourceQueue;
 import cn.evole.onebot.sdk.response.misc.RecordInfoResp;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.val;
@@ -32,17 +34,13 @@ import net.mamoe.mirai.contact.announcement.OfflineAnnouncement;
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent;
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent;
 import net.mamoe.mirai.event.events.NewFriendRequestEvent;
-import net.mamoe.mirai.message.data.MessageChain;
-import net.mamoe.mirai.message.data.MessageSource;
-import net.mamoe.mirai.message.data.MessageSourceKind;
+import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.MiraiExperimentalApi;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static cn.evole.onebot.mirai.util.ImgUtils.*;
@@ -78,8 +76,16 @@ public class ApiMap {
                 case "send_private_msg" -> {
                     responseDTO = sendPrivateMessage(params);
                 }
+                case "send_private_forward_msg" -> {
+                    val targetQQId = params.get("user_id").getAsLong();
+                    responseDTO =sendForwardMessage(bot.getFriendOrFail(targetQQId), params);
+                }
                 case "send_group_msg" -> {
                     responseDTO =sendGroupMessage(params);
+                }
+                case "send_group_forward_msg" -> {
+                    val targetGroupId = params.get("group_id").getAsLong();
+                    responseDTO =sendForwardMessage(bot.getGroupOrFail(targetGroupId), params);
                 }
                 case "send_discuss_msg" -> {
                     responseDTO =sendDiscussMessage(params);
@@ -322,7 +328,55 @@ public class ApiMap {
         if (messageChain != null && !messageChain.contentToString().isEmpty()) {
             val receipt = group.sendMessage(messageChain);
             cachedSourceQueue.add(receipt.getSource());
-            return new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
+            return new MessageSuccess(DataBaseUtils.toMessageId(
+                    receipt.getSource().getIds(),
+                    receipt.getSource().getBotId(),
+                    receipt.getSource().getFromId()));
+        }
+        else {
+            return new MessageSuccess(-1);
+        }
+    }
+
+    public ActionData<?> sendForwardMessage(Contact contact, JsonObject params) {
+        val raw = params.has("auto_escape") && params.get("auto_escape").getAsBoolean();
+        val messages = params.get("messages");
+
+        List<ForwardMessage.Node> nodes = new ArrayList<>();
+        JsonArray jsonArray = messages.getAsJsonArray();
+        for (JsonElement element : jsonArray) {
+            JsonObject jsonObject = element.getAsJsonObject();
+            String type = jsonObject.get("type").getAsString();
+            if (type.equals("node")) {
+                jsonObject = jsonObject.get("data").getAsJsonObject();
+                long uin = jsonObject.get("uin").getAsLong();
+                String name = jsonObject.get("name").getAsString();
+                JsonElement content = jsonObject.get("content");
+
+                val messageChain = OnebotMsgUtils.messageToChains(bot, contact, content, raw);
+                if (messageChain != null) {
+                    nodes.add(new ForwardMessage.Node(uin, -1, name, messageChain));
+                }
+            }
+        }
+
+        // val group = bot.getGroupOrFail(targetId);
+        // val messageChain = OnebotMsgUtils.messageToChains(bot, group, messages, raw);
+
+        var messagesL = 1;
+
+        if (!nodes.isEmpty()) {
+            messagesL = nodes.size();
+
+            var messageChainBuilder = new MessageChainBuilder();
+            messageChainBuilder.add(new ForwardMessage(List.of("略..."), "聊天记录", "", "", "查看 "+messagesL+" 条转发消息", nodes));
+            MessageChain messageChain = messageChainBuilder.build();
+            val receipt = contact.sendMessage(messageChain);
+            cachedSourceQueue.add(receipt.getSource());
+            return new MessageSuccess(DataBaseUtils.toMessageId(
+                    receipt.getSource().getInternalIds(),
+                    receipt.getSource().getBotId(),
+                    receipt.getSource().getFromId()));
         }
         else {
             return new MessageSuccess(-1);
@@ -346,7 +400,10 @@ public class ApiMap {
         if (messageChain != null && !messageChain.contentToString().isEmpty()) {
             val receipt = contact.sendMessage(messageChain);
             cachedSourceQueue.add(receipt.getSource());
-            return new MessageSuccess(DataBaseUtils.toMessageId(receipt.getSource().getInternalIds(), bot.getId(), receipt.getSource().getFromId()));
+            return new MessageSuccess(DataBaseUtils.toMessageId(
+                    receipt.getSource().getInternalIds(),
+                    receipt.getSource().getBotId(),
+                    receipt.getSource().getFromId()));
         } else {
             return new MessageSuccess(-1);
         }
