@@ -337,15 +337,21 @@ public class OnebotMsgUtils {
             content = fileStr.substring(index + 3);
         }
         switch (protocol) {
-            case "http" -> {
-                throw new NotImplementedError("Not Implemented" );
-            }
             case "file" -> {
                 File file = new File(content);
                 return ExternalResource.uploadAsImage(file, contact);
             }
-            case "base64" -> {
-                byte[] decode = Base64.getDecoder().decode(content);
+            case "http", "https", "base64" -> {
+                byte[] decode;
+                if (protocol.equals("base64")) {
+                    decode = Base64.getDecoder().decode(content);
+                } else {
+                    decode = HttpUtils.getBytesFromHttpUrl(fileStr);
+                }
+
+                if (decode == null || decode.length == 0) {
+                    throw new IllegalStateException("Unexpected value: " + protocol);
+                }
 
                 ImageType t = ImageType.PNG;
                 if ((decode[0] & 0xff) == 0x47 && (decode[1] & 0xff) == 0x49) {
