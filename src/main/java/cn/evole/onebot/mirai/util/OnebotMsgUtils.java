@@ -15,6 +15,7 @@ import net.mamoe.mirai.utils.ExternalResource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -64,7 +65,7 @@ public class OnebotMsgUtils {
                     if (msg.getAsJsonObject().has("type")){
                         if (data.getAsJsonObject().asMap().containsKey("text"))
                              messageChain.append(new PlainText(data.getAsJsonObject().get("text").getAsString()));
-                        else messageChain.append(textToMessageInternal(bot, contact, message));
+                        else messageChain.append(textToMessageInternal(bot, contact, msg));
                     }
                 } catch (NullPointerException e) {
                     logger.warning("Got null when parsing Chain message object");
@@ -311,7 +312,9 @@ public class OnebotMsgUtils {
             }
             case "reply" -> {
                 if (PluginConfig.INSTANCE.getDb().getEnable() && OneBotMirai.INSTANCE.db != null) {
-                    return MessageSource.quote(MessageChain.deserializeFromJsonString(new String(DataBaseUtils.toByteArray(Integer.parseInt(args.get("id"))))));
+                    DBUtils.MessageNode messageNode = OneBotMirai.INSTANCE.db.query(bot.getId());
+                    return MessageSource.quote(MessageChain.deserializeFromJsonString(messageNode.content));
+                    //return MessageSource.quote(MessageChain.deserializeFromJsonString(new String(DataBaseUtils.toByteArray(Integer.parseInt(args.get("id"))))));
                 }
             }
             default -> {
@@ -344,9 +347,20 @@ public class OnebotMsgUtils {
             case "base64" -> {
                 byte[] decode = Base64.getDecoder().decode(content);
 
+                ImageType t = ImageType.PNG;
+                if ((decode[0] & 0xff) == 0x47 && (decode[1] & 0xff) == 0x49) {
+                    t = ImageType.GIF;
+                }
+                if ((decode[0] & 0xff) == 0x89 && (decode[1] & 0xff) == 0x50) {
+                    t = ImageType.PNG;
+                }
+                if ((decode[0] & 0xff) == 0xff && (decode[1] & 0xff) == 0xd8) {
+                    t = ImageType.JPG;
+                }
+
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
                 try {
-                    return ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, ImageType.PNG.getFormatName()).toAutoCloseable(), contact);
+                    return ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, t.getFormatName()).toAutoCloseable(), contact);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

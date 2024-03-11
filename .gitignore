@@ -1,0 +1,9 @@
+# 项目排除路径
+.gradle/
+build/
+build/classes/kotlin/main/
+.idea
+
+debug-sandbox/
+local.properties
+*.zip
