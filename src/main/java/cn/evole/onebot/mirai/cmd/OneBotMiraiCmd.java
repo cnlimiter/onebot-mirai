@@ -43,7 +43,11 @@ public class OneBotMiraiCmd extends JCompositeCommand {
         sender.sendMessage("导出csv成功:" + file.toFile().getAbsolutePath());
     }
 
-
-
-
+    @SubCommand
+    public void reload(CommandSender sender) {
+        OneBotMirai.INSTANCE.close();
+        sender.sendMessage("OneBot Stopped! Reloading...");
+        OneBotMirai.INSTANCE.init();
+        sender.sendMessage("OneBot Loaded!");
+    }
 }

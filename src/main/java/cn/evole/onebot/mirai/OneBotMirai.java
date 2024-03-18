@@ -49,11 +49,28 @@ public final class OneBotMirai extends JavaPlugin {
     public final File imageFolder = new File(getDataFolder(), "image");
     public final File recordFolder = new File(getDataFolder(), "record");
     public final File dbFolder = new File(getDataFolder(), "db");
-    public NanoDb<Long, DBUtils.MessageNode> db  = null;
+    public NanoDb<Long, DBUtils.MessageNode> db = null;
 
     @Override
     public void onEnable() {
 
+        CommandManager.INSTANCE.registerCommand(OneBotMiraiCmd.INSTANCE, false);
+
+        logger.info("OneBot Loaded!");
+        logger.info("插件当前版本: " + VERSION);
+        logger.info("开发交流群: 720975019");
+
+        init();
+    }
+
+    @Override
+    public void onDisable() {
+        close();
+        logger.info("OneBot Stopped!");
+    }
+
+
+    public void init() {
         this.reloadPluginConfig(PluginConfig.INSTANCE);
         FileUtils.checkFolder(imageFolder.toPath());
         FileUtils.checkFolder(recordFolder.toPath());
@@ -63,70 +80,57 @@ public final class OneBotMirai extends JavaPlugin {
             } catch (Exception ignored) {
             }
         }
-
-        CommandManager.INSTANCE.registerCommand(OneBotMiraiCmd.INSTANCE, false);
-
-        logger.info("OneBot Loaded!");
-        logger.info("插件当前版本: " + VERSION);
-        logger.info("开发交流群: 720975019");
-
-
-
         List<Bot> instances = Bot.getInstances();
         logger.info(String.format("当前存在的机器人数量: %d", instances.size()));
         instances.forEach(bot -> {
             logger.info(String.format("Bot : %s 开始创建", bot.getId()));
             if (!SessionManager.getSessions().containsKey(bot.getId())) {
                 val botId = String.valueOf(bot.getId());
-                if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)){
+                if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(botId)) {
                     val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                     SessionManager.createBotSession(bot, mapConfig);
-                        logger.info(String.format("Bot: %s 创建Session", bot.getId()));
-                }
-                else {
+                    logger.info(String.format("Bot: %s 创建Session", bot.getId()));
+                } else {
                     logger.debug(String.format("Bot: %s 未进行OneBot配置,请在setting.yml中进行配置", bot.getId()));
                 }
-            }
-            else {
+            } else {
                 logger.debug(String.format("Bot: %s 已经存在", bot.getId()));
             }
         });
 
         initialSubscription = GlobalEventChannel.INSTANCE.subscribeAlways(BotEvent.class, event -> {
-            if (SessionManager.getSessions().containsKey(event.getBot().getId())){
+            if (SessionManager.getSessions().containsKey(event.getBot().getId())) {
                 SessionManager.getSessions().get(event.getBot().getId()).triggerEvent(event);
             }
-            if (event instanceof BotOnlineEvent onlineEvent){
-                if (!SessionManager.containsSession(onlineEvent.getBot().getId())){
+            if (event instanceof BotOnlineEvent onlineEvent) {
+                if (!SessionManager.containsSession(onlineEvent.getBot().getId())) {
                     val botId = String.valueOf(onlineEvent.getBot().getId());
-                    if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))){
+                    if (Objects.requireNonNull(PluginConfig.INSTANCE.getBots()).containsKey(String.valueOf(event.getBot().getId()))) {
                         val mapConfig = PluginConfig.INSTANCE.getBots().get(botId);
                         val session = SessionManager.createBotSession(onlineEvent.getBot(), mapConfig);
                         logger.info(String.format("Bot: %s 创建Session", event.getBot().getId()));
                         if (PluginConfig.INSTANCE.getDebug()) logger.info("OneBot Session: " + session);
-                    }
-                    else {
+                    } else {
                         logger.warning(String.format("Bot: %s 未进行OneBot配置,请在setting.yml中进行配置", event.getBot().getId()));
                     }
                 }
 
-            }
-            else if (event instanceof MessageEvent messageEvent){
+            } else if (event instanceof MessageEvent messageEvent) {
                 val bot = messageEvent.getBot();
                 val botId = bot.getId();
                 if (SessionManager.containsSession(botId)) {
                     DBUtils.saveMessageToDB(messageEvent);//存入数据库
                     val session = SessionManager.get(botId);
-                    if (messageEvent instanceof GroupMessageEvent groupMessageEvent){
+                    if (messageEvent instanceof GroupMessageEvent groupMessageEvent) {
                         session.getApiImpl().getCachedSourceQueue().add(groupMessageEvent.getSource());
                     }
 
-                    if (messageEvent instanceof GroupTempMessageEvent groupTempMessageEvent){
+                    if (messageEvent instanceof GroupTempMessageEvent groupTempMessageEvent) {
                         session.getApiImpl().getCachedTempContact()
                                 .put(groupTempMessageEvent.getSender().getId(), groupTempMessageEvent.getGroup().getId());
                     }
 
-                    if (session.getBotConfig().getCacheImage()){
+                    if (session.getBotConfig().getCacheImage()) {
                         messageEvent.getMessage().stream()
                                 .filter(singleMessage -> singleMessage instanceof Image)
                                 .forEach(singleMessage -> {
@@ -134,15 +138,13 @@ public final class OneBotMirai extends JavaPlugin {
                                     long imageSize;
                                     val imageMD5 = BaseUtils.bytesToHexString(img.getMd5());
                                     val subject = messageEvent.getSubject();
-                                    if (subject instanceof Member || subject instanceof Friend){
+                                    if (subject instanceof Member || subject instanceof Friend) {
                                         val imageHeight = img.getHeight();
                                         val imageWidth = img.getWidth();
                                         imageSize = (long) imageHeight * imageWidth;
-                                    }
-                                    else if (subject instanceof Group){
+                                    } else if (subject instanceof Group) {
                                         imageSize = img.getSize();
-                                    }
-                                    else imageSize = 0;
+                                    } else imageSize = 0;
 
                                     val imgMetaContent = constructCacheImageMeta(
                                             imageMD5,
@@ -158,7 +160,7 @@ public final class OneBotMirai extends JavaPlugin {
 
                                 });
                     }
-                    if (session.getBotConfig().getCacheRecord()){
+                    if (session.getBotConfig().getCacheRecord()) {
                         messageEvent.getMessage().stream()
                                 .filter(singleMessage -> singleMessage instanceof OnlineAudio)
                                 .forEach(singleMessage -> {
@@ -177,20 +179,17 @@ public final class OneBotMirai extends JavaPlugin {
 
 
                 }
-            }
-            else if (event instanceof NewFriendRequestEvent requestEvent) {
+            } else if (event instanceof NewFriendRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
-            }
-            else if (event instanceof MemberJoinRequestEvent requestEvent) {
+            } else if (event instanceof MemberJoinRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
                 }
-            }
-            else if (event instanceof BotInvitedJoinGroupRequestEvent requestEvent) {
+            } else if (event instanceof BotInvitedJoinGroupRequestEvent requestEvent) {
                 if (SessionManager.containsSession(requestEvent.getBot().getId())) {
                     val session = SessionManager.get(requestEvent.getBot().getId());
                     session.getApiImpl().getCacheRequestQueue().add(requestEvent);
@@ -199,39 +198,38 @@ public final class OneBotMirai extends JavaPlugin {
         });
     }
 
-    @Override
-    public void onDisable() {
+    public void close() {
         db.save();
         initialSubscription.complete();
-        SessionManager.getSessions().forEach((aLong, botSession) -> SessionManager.closeSession(aLong));
-        logger.info("OneBot Stopped!");
+        SessionManager.closeAllSessions();
     }
 
-
-    private File image(String imageName){
+    private File image(String imageName) {
         return new File(this.imageFolder, imageName);
     }
 
-    private File record(String recordName){
+    private File record(String recordName) {
         return new File(this.recordFolder, recordName);
     }
 
-    public void saveImageOrRecord(String name, String data, boolean img){
+    public void saveImageOrRecord(String name, String data, boolean img) {
         BaseUtils.safeRun(() -> {
-            if(data != null) {
+            if (data != null) {
                 try {
                     Files.writeString(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.CREATE_NEW);
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
         });
     }
 
-    public void saveImageOrRecord(String name, byte[] data, boolean img){
+    public void saveImageOrRecord(String name, byte[] data, boolean img) {
         BaseUtils.safeRun(() -> {
-            if(data != null) {
+            if (data != null) {
                 try {
                     Files.write(img ? image(name).toPath() : record(name).toPath(), data, StandardOpenOption.CREATE_NEW);
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
         });
     }
