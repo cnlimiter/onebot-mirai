@@ -3,15 +3,14 @@ package cn.evole.onebot.mirai.util;
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.config.PluginConfig;
 import cn.evole.onebot.mirai.core.session.SessionManager;
-import cn.evole.onebot.mirai.web.queue.CacheRequestQueue;
 import cn.evole.onebot.mirai.web.queue.CacheSourceQueue;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import kotlin.NotImplementedError;
 import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
+import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.ExternalResource;
@@ -114,8 +113,11 @@ public class OnebotMsgUtils {
 
         else if (message instanceof Audio audio) return "[CQ:record,url=,file="+ Arrays.toString(audio.getFileMd5()) +"]";
 
-        else return "此处消息的转义尚未被插件支持";
-
+        //else return "此处消息的转义尚未被插件支持";
+        else {
+            logger.warning("此处消息的转义尚未被插件支持: " + message.toString());
+            return "";
+        }
     }
 
     private static MessageChain codeToChain(Bot bot, String message, Contact contact){
@@ -270,7 +272,13 @@ public class OnebotMsgUtils {
                         args.get("image")
                 );
             }
-            case "record" -> {}
+            case "record" -> {
+                // 语音
+                String file = args.get("file");
+                Message message = VoiceUtils.sendRecordMsg(file, contact);
+                logger.info(String.format("Record: %s", message));
+                return message;
+            }
             case "contact" -> {
                 if ("qq".equals(args.get("type"))) {
                     return  RichMessageUtils.contactQQ(bot, Long.parseLong(args.get("id")));
@@ -375,9 +383,9 @@ public class OnebotMsgUtils {
                     t = ImageType.JPG;
                 }
 
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
+                InputStream bio = new ByteArrayInputStream(decode);
                 try {
-                    return ExternalResource.uploadAsImage(ExternalResource.create(byteArrayInputStream, t.getFormatName()).toAutoCloseable(), contact);
+                    return ExternalResource.uploadAsImage(ExternalResource.create(bio, t.getFormatName()).toAutoCloseable(), contact);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -386,5 +394,4 @@ public class OnebotMsgUtils {
         }
 
     }
-
 }
