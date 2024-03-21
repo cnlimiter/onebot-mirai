@@ -2,10 +2,14 @@ package cn.evole.onebot.mirai.util;
 
 import cn.evole.onebot.mirai.OneBotMirai;
 import cn.evole.onebot.mirai.config.PluginConfig;
+import cn.evole.onebot.mirai.core.session.SessionManager;
+import cn.evole.onebot.mirai.web.queue.CacheRequestQueue;
+import cn.evole.onebot.mirai.web.queue.CacheSourceQueue;
 import cn.evole.onebot.sdk.util.DataBaseUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import kotlin.NotImplementedError;
+import lombok.val;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Group;
@@ -312,8 +316,15 @@ public class OnebotMsgUtils {
             }
             case "reply" -> {
                 if (PluginConfig.INSTANCE.getDb().getEnable() && OneBotMirai.INSTANCE.db != null) {
-                    DBUtils.MessageNode messageNode = OneBotMirai.INSTANCE.db.query(bot.getId());
-                    return MessageSource.quote(MessageChain.deserializeFromJsonString(messageNode.content));
+                    if (SessionManager.containsSession(bot.getId())) {
+                        val session = SessionManager.get(bot.getId());
+                        CacheSourceQueue cachedSources = session.getApiImpl().getCachedSourceQueue();
+                        MessageSource messageSource = cachedSources.get(Integer.parseInt(args.get("id")));
+                        return MessageSource.quote(messageSource);
+                    } else {
+                        logger.warning("CacheSourceQueue has not found reply messageId -> " + args.get("id"));
+                    }
+
                     //return MessageSource.quote(MessageChain.deserializeFromJsonString(new String(DataBaseUtils.toByteArray(Integer.parseInt(args.get("id"))))));
                 }
             }
