@@ -329,7 +329,7 @@ public class ApiMap {
             val receipt = group.sendMessage(messageChain);
             cachedSourceQueue.add(receipt.getSource());
             return new MessageSuccess(DataBaseUtils.toMessageId(
-                    receipt.getSource().getIds(),
+                    receipt.getSource().getInternalIds(),
                     receipt.getSource().getBotId(),
                     receipt.getSource().getFromId()));
         }

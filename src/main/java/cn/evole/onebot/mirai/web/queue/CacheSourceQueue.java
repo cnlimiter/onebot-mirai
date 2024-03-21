@@ -26,6 +26,6 @@ public class CacheSourceQueue extends LinkedHashMap<Integer, MessageSource> {
     }
 
     public void add(MessageSource source){
-        put(DataBaseUtils.toMessageId(source.getIds(), source.getBotId(), source.getFromId()), source);
+        put(DataBaseUtils.toMessageId(source.getInternalIds(), source.getBotId(), source.getFromId()), source);
     }
 }

@@ -70,6 +70,12 @@ public class OneBotWSClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshake) {
         miraiLogger.info(String.format("Bot: %s 反向Websocket服务端 / 成功连接", botSession.getBot().getId()));
+
+        // 连接成功时，上报一次心跳
+        var event = new HeartbeatMetaEvent();
+        event.setMetaEventType("heartbeat");
+        event.setSelfId(botSession.getBot().getId());
+        send(GsonUtils.getGson().toJson(event));
     }
 
     @Override
